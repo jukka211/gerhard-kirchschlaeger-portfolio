@@ -1,10 +1,11 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import Link from "next/link";
+import {useLayoutEffect, useRef} from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { urlFor } from "@/sanity/lib/image";
-import type { GalleryItem } from "@/types/sanity";
+import {ScrollTrigger} from "gsap/ScrollTrigger";
+import {urlFor} from "@/sanity/lib/image";
+import type {GalleryItem} from "@/types/sanity";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,7 +13,7 @@ type Props = {
   items: GalleryItem[];
 };
 
-export default function HorizontalGallery({ items }: Props) {
+export default function HorizontalGallery({items}: Props) {
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -22,22 +23,15 @@ export default function HorizontalGallery({ items }: Props) {
 
     if (!slider || !wrapper) return;
 
-    const setupLayout = () => {
-      const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-      gsap.killTweensOf(wrapper);
-      gsap.set(wrapper, { x: 0 });
-
-      if (isMobile) {
-        document.body.style.height = "";
-        return;
-      }
-
+    const setupHorizontalScroll = () => {
       const totalWidth = wrapper.scrollWidth;
       const scrollLength = Math.max(totalWidth - window.innerWidth, 0);
 
       document.body.style.height = `${scrollLength + window.innerHeight}px`;
+
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+
+      gsap.set(wrapper, {x: 0});
 
       gsap.to(wrapper, {
         x: -scrollLength,
@@ -54,13 +48,12 @@ export default function HorizontalGallery({ items }: Props) {
       ScrollTrigger.refresh();
     };
 
-    setupLayout();
-    window.addEventListener("resize", setupLayout);
+    setupHorizontalScroll();
+    window.addEventListener("resize", setupHorizontalScroll);
 
     return () => {
-      window.removeEventListener("resize", setupLayout);
+      window.removeEventListener("resize", setupHorizontalScroll);
       ScrollTrigger.getAll().forEach((st) => st.kill());
-      gsap.killTweensOf(wrapper);
       document.body.style.height = "";
     };
   }, [items]);
@@ -68,9 +61,9 @@ export default function HorizontalGallery({ items }: Props) {
   return (
     <>
       <div className="site-header">
-        <div className="info">
+        <Link href="/about" className="info">
           <p>Info</p>
-        </div>
+        </Link>
       </div>
 
       <div className="container">
