@@ -8,11 +8,11 @@ export default function HomePage() {
   return (
     <main className="home-page">
       <div className="home-bg home-bg--about">
-        <img src="/home-bg/about.jpg" alt="" />
+        <img src="/home-bg/about.svg" alt="" />
       </div>
 
       <div className="home-bg home-bg--portfolio">
-        <video src="/home-bg/portfolio.mp4" autoPlay muted loop playsInline />
+      <img src="/home-bg/portfolio.svg" alt="" />
       </div>
 
       <div className="home-bg home-bg--play">
@@ -20,7 +20,7 @@ export default function HomePage() {
       </div>
 
       <div className="home-bg home-bg--fonts">
-        <img src="/home-bg/fonts.jpg" alt="" />
+        <img src="/home-bg/fonts.svg" alt="" />
       </div>
 
       <nav className="home-nav" aria-label="Main navigation">

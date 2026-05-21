@@ -5,7 +5,7 @@ export default function AboutPage() {
   return (
     <div className="about-sheet">
       <Link href="/" className="back-button">
-        ( X )
+     (x)
       </Link>
 
       <main className="about">
@@ -140,23 +140,7 @@ export default function AboutPage() {
           <p>UID ATU49887500</p>
         </section>
 
-        <section className="about-row">
-          <p>
-            <a href="https://fonts.gerhardkirchschlaeger.at">(Fonts)</a>
-          </p>
-        </section>
 
-        <section className="about-row">
-          <p>
-            <a href="https://gerhardkirchschlaeger.at">(Web.)</a>
-          </p>
-        </section>
-
-        <section className="about-row">
-          <p>
-            <a href="https://instagram.com/gerhard.kirchschlaeger">(Inst.)</a>
-          </p>
-        </section>
       </main>
     </div>
   );
