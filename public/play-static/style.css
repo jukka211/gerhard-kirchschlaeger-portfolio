@@ -1,0 +1,339 @@
+@font-face {
+    font-family: 'Freizeit140';
+    src: url('Freizeit140-Regular.otf');
+}
+
+@font-face {
+    font-family: 'Freizeit';
+    src: url('Freizeit-Regular.otf');
+}
+
+@font-face {
+    font-family: 'FreizeitMedium';
+    src: url('Freizeit-Medium.otf');
+}
+
+@font-face {
+    font-family: 'Freizeit140Medium';
+    src: url('Freizeit140Trial-Medium.otf');
+}
+
+body {
+
+    display: flex;
+    justify-content: flex-start; /* Corrected */
+    width: 100vw;
+    height: 100vh; /* Full viewport height */
+    margin: 0; /* Remove default margin */
+    overflow: hidden; /* Prevent scrolling */
+    margin-left: 10px;
+    box-sizing: border-box; /* Ensure consistent width/height calculations */
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    padding-left: 0.4%;
+    padding-bottom: 0.4%;
+    padding-top: 0.3%;
+}
+.title {
+   
+    
+    width: 100%; /* Avoid horizontal overflow issues */
+    height: 100%;
+    position: fixed;
+    display: flex;
+    flex-direction: column; /* Stack lines vertically */
+    align-items: flex-start; /* Align to the left */
+    font-family: 'Freizeit', sans-serif; /* Added fallback font */
+    font-size: 5rem;
+    line-height: 83%;
+   user-select: none;
+    overflow: hidden; /* Prevent scrolling */
+   
+}
+
+.line {
+    letter-spacing: -5.5px;
+    display: flex;
+    width: 100%;
+  
+}
+
+.line span {
+    display: inline-block;
+    cursor: pointer; /* Change cursor to indicate clickable */
+    
+    margin-right: 0;
+   
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1.1); /* Bouncy effect */
+}
+
+.line div {
+    display: inline-block;
+
+    margin-right: 0;
+  
+    
+}
+
+.title a {
+    text-decoration: none;
+    color: black;
+   
+    display: flex;
+    
+    white-space: nowrap;
+    
+    margin: 0;
+    padding: 0;
+}
+
+.line span:hover {
+    transform: scaleX(1.15); /* Stretch the element horizontally */
+   padding-right: 0.1rem; /* Adjusted to rem */
+
+    transform-origin: center;
+}
+
+.custom-alert {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0);
+    
+    color: rgb(0, 0, 0);
+    font-family: 'Freizeit', sans-serif;
+    font-size: 14px;
+    
+    padding: 2px 8px; /* Shortened padding declaration */
+    z-index: 9999;
+    pointer-events: none; /* Prevents interacting with the alert */
+}
+
+.inst {
+    font-family: 'Freizeit', sans-serif; /* Added fallback font */
+    font-size: 1.3rem;
+    line-height: 1rem;
+    border-radius: 32px;
+    border: 0px solid black;
+    position: fixed;
+    bottom:1.6%;
+  
+    z-index: 888;
+    background-color: transparent;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1.1); /* Bouncy effect */
+    cursor: pointer;
+    
+}
+.inst img {
+    object-fit: contain;
+    width: 18px;
+}
+.inst:hover {
+    transform: scale(0.9);
+
+}
+
+#motionBtn {
+
+   
+     display: none;
+
+    
+  }
+
+.allow:hover {
+background-color: #000000;
+color:#FFFFFF;
+}
+
+
+.text-mobile {
+    display: none;
+}
+
+.text-mobile a{
+    text-decoration: none;
+    color: black;
+}
+@media screen and (max-width: 620px) {
+
+     #motionBtn {
+        position: fixed;
+        font-family: 'FreizeitMedium';
+        font-size: 1.3rem;
+        line-height: 85%;
+        background:#ffffff;
+        color:#000000;
+        width:100%;
+        height: 100vh;
+        border: 0px;
+        cursor: pointer;
+        z-index: 999; /* Ensure it stays on top */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 600ms bic-bezier(0.34, 1.56, 0.64, 1.1);
+         overflow:hidden;
+      }
+      .allow {
+        padding: 40px;
+        text-align: left;        
+        background:#FFFFFF;
+        color:#000000;
+        box-shadow: 0px 0px 7px rgb(204, 204, 204);
+        border-radius: 50px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        transition: all 600ms bic-bezier(0.34, 1.56, 0.64, 1.1);
+        }
+    
+    .title {
+        font-size: 3.5rem;
+        line-height: 3rem;
+        transform-origin: top center;
+        display: none;
+    }
+    
+    .line span {
+        letter-spacing: -5px;
+    }
+    .text-mobile {
+        margin-top: 10px;
+        margin-left: 10px;
+        font-size: 3.5rem;
+        line-height: 3rem;
+        letter-spacing: -2.5px;
+        transform-origin: top center;
+        width: 100%; /* Avoid horizontal overflow issues */
+        
+        position: fixed;
+        display: block;
+    
+        font-family: 'Freizeit', sans-serif; /* Added fallback font */
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1.1); /* Bouncy effect */
+        user-select: none;
+        overflow: hidden; /* Prevent scrolling */
+
+    }
+    body {
+        overflow: hidden;
+    }
+    .text-mobile a:hover {
+        text-decoration: none;
+     
+        user-select: none;
+       
+     
+    }
+    .inst {
+        margin-left: 10px;
+    }
+}
+
+@media screen and (min-width: 3500px) {
+    .title {
+        font-size: 14rem;
+        line-height: 85%;
+    }
+    
+    .line {
+        letter-spacing: -0.6rem;
+    }
+    .inst img {
+         width: 50px;
+    }
+   
+}
+
+@media screen and (min-width: 2801px) and (max-width: 3499px) {
+    .title {
+        font-size: 10rem;
+        line-height: 85%;
+    }
+    
+    .line {
+        letter-spacing: -0.6rem;
+    }
+    .inst img {
+        width: 40px;
+   }
+}
+
+@media screen and (min-width: 2239px) and (max-width: 2800px) {
+    .title {
+        font-size: 7rem;
+        line-height: 85%;
+    }
+    
+    .line {
+        letter-spacing: -0.6rem;
+    }
+    .inst img {
+        width: 30px;
+   }
+}
+
+@media screen and (min-width: 621px) and (max-width: 1440px) {
+    .title {
+        font-size: 3.5rem;
+        line-height: 85%;
+    }
+    .line {
+        letter-spacing: -0.2rem;
+    }
+    .inst img {
+        width: 16px;
+   }
+}
+
+@media only screen and (max-width: 940px) and (orientation: landscape) {
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: flex-start; /* Align items to the start of the screen */
+        align-items: flex-end; /* Align items to the bottom of the screen */
+        height: 100vh; /* Make sure body takes full height */
+        width: 100vw; /* Make sure body takes full width */
+        overflow: hidden; /* Prevent overflow */
+    }
+
+    .text-mobile {
+        font-size: 3.5rem;
+        line-height: 3rem;
+        letter-spacing: -2.5px;
+        transform-origin: bottom left; /* Rotate around bottom-left corner */
+        width: auto; /* Set width as per content */
+        height: auto; /* Set height as per content */
+        padding-bottom: 20px; /* Optional padding if you need space from the bottom */
+        padding-left: 10px;
+        padding-top: 10px;
+        font-family: 'Freizeit', sans-serif; /* Fallback font */
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1.1); /* Smooth effect */
+        user-select: none;
+        overflow: hidden; /* Prevent overflow */
+        
+        position: absolute; /* Absolute positioning */
+        bottom: 0; /* Align to bottom */
+        left: 0; /* Align to left */
+        display: block;
+        /* Rotate and translate */
+        transform: rotate(-90deg) translate(0, 100%);
+    }
+
+    .title {
+        display: none;
+
+    }
+
+    .inst {
+        bottom: 10px; /* Align to bottom */
+        right: 10px; /* Align to left */
+    }
+}

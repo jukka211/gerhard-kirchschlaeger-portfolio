@@ -1,4 +1,4 @@
-import {groq} from "next-sanity";
+import { groq } from "next-sanity";
 
 export const homePageQuery = groq`
   *[_type == "homePage"][0]{
@@ -23,6 +23,75 @@ export const homePageQuery = groq`
         webm{
           asset->{
             url
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const fontsPageQuery = groq`
+  *[_type == "fontsPage"][0]{
+    title,
+    navLinks[]{
+      _key,
+      label,
+      url
+    },
+    introTitle,
+    introText,
+    columns{
+      left[]{
+        _key,
+        size,
+        marginTopVh,
+        marginBottomVh,
+        image{
+          alt,
+          asset->{
+            url,
+            metadata{
+              dimensions{
+                width,
+                height
+              }
+            }
+          }
+        }
+      },
+      middle[]{
+        _key,
+        size,
+        marginTopVh,
+        marginBottomVh,
+        image{
+          alt,
+          asset->{
+            url,
+            metadata{
+              dimensions{
+                width,
+                height
+              }
+            }
+          }
+        }
+      },
+      right[]{
+        _key,
+        size,
+        marginTopVh,
+        marginBottomVh,
+        image{
+          alt,
+          asset->{
+            url,
+            metadata{
+              dimensions{
+                width,
+                height
+              }
+            }
           }
         }
       }

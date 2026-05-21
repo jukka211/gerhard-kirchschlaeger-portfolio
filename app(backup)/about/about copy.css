@@ -1,0 +1,102 @@
+.about {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.about-row {
+  flex: 1 1 0%;
+  min-width: 0;
+  position: sticky;
+  top: 1rem;
+  height: 100vh;
+
+  padding-top: 1.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-size: 1.4rem;
+  line-height: 1;
+  text-align: center;
+  transition: all 0.7s ease, font-size 0.7s ease;
+  color: black;
+  container-type: inline-size;
+  transform-origin: center center;
+}
+
+.about-text {
+  width: 100%;
+}
+
+.about-text p {
+  line-height: 0.95;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.awards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.award-item p {
+  margin: 0;
+  white-space: nowrap;
+}
+
+a {
+  color: black;
+}
+
+
+
+.about:hover .about-row:hover {
+  flex: 11.83 1 0%;
+  font-size: clamp(4.9rem, 11.83cqi, 11.83rem);
+}
+.back-button {
+  position: fixed;
+  top: 0rem;
+  left: 0rem;
+  z-index: 100;
+  color: black;
+  text-decoration: none;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.back-button:hover {
+  font-size: 7rem;
+}
+
+@media (max-width: 768px) {
+  .about {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .about-column {
+    flex: none !important;
+    position: static;
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    padding: 24px 20px;
+    font-size: 2.4rem !important;
+    transition: none;
+    overflow: visible;
+  }
+
+  .about:hover .about-column,
+  .about:hover .about-column:hover {
+    flex: none !important;
+    width: 100%;
+    font-size: 2.4rem !important;
+  }
+}

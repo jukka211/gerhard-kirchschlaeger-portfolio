@@ -1,0 +1,159 @@
+  .about {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    margin-top: 2.5rem;
+  }
+
+  .about-row {
+    flex: none;
+    width: 100%;
+    padding: 0 20rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;  /* was: hidden */
+    font-size: 2rem;
+    line-height: 0.97;
+    text-align: center;
+    transition: font-size 0.7s ease;
+    color: black;
+    container-type: inline-size;
+  }
+
+  .about-row p {
+    margin: 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    width: 100%;
+  }
+
+  .about-row a {
+    color: black;
+  }
+
+  .about-row:hover {
+    font-size: 12rem;
+    }
+
+
+    .back-button {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      color: black;
+      text-decoration: none;
+      padding: 0.4rem 0.5rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      font-size: 2rem;
+    }
+
+  .back-button:hover {
+    font-size: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .about-row {
+      padding: 0 1.5rem;
+      font-size: 1.8rem !important;
+      transition: none;
+    }
+
+    .about-row:hover {
+      font-size: 1.8rem !important;
+    }
+  }
+
+  .about-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: white;
+    overflow-y: auto;
+    animation: aboutRollDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  
+  @keyframes aboutRollDown {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .back-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 10001;
+    color: black;
+    text-decoration: none;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 16px;
+  }
+  
+  .about {
+    padding-top: 40px;
+  }
+  
+  .about-row {
+    padding: 0 10px;
+  }
+
+  .site-header {
+    position: fixed;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    padding-left: 10px;
+  }
+  
+  .info,
+  .back-button {
+    color: black;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 16px;
+  }
+  
+  .info {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+  
+  .about-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: white;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .back-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 10001;
+  }
+  
+  .about {
+    padding-top: 40px;
+  }
+  
+  .about-row {
+    padding: 0 10px;
+  }
