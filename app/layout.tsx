@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SanityLive } from "@/sanity/lib/live";
+import SanityLiveGate from "./SanityLiveGate";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +17,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         {children}
-        <SanityLive />
+        <SanityLiveGate>
+          <SanityLive />
+        </SanityLiveGate>
       </body>
     </html>
   );
