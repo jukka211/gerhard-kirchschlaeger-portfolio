@@ -33,31 +33,17 @@ export default function HomePage() {
             about
           </Link>
 
-          <Link
-            href={
-              useInternalLinks
-                ? "/portfolio"
-                : "https://portfolio.gerhardkirchschlaeger.at"
-            }
-            className="home-link home-link--portfolio"
-          >
-            portfolio
-          </Link>
+          <Link href="/portfolio" className="home-link home-link--portfolio">
+  portfolio
+</Link>
 
           <Link href="/play" className="home-link home-link--play">
             play
           </Link>
 
-          <Link
-            href={
-              useInternalLinks
-                ? "/fonts"
-                : "https://fonts.gerhardkirchschlaeger.at"
-            }
-            className="home-link home-link--fonts"
-          >
-            fonts
-          </Link>
+          <Link href="/fonts" className="home-link home-link--fonts">
+  fonts
+</Link>
         </div>
 
         <div className="home-contact-row">
