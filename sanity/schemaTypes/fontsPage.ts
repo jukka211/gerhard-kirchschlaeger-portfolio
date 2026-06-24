@@ -27,10 +27,15 @@ export const fontsPage = defineType({
             }),
             defineField({
               name: "url",
-              title: "External URL",
+              title: "Link",
               type: "url",
               description:
-                "Leave empty for non-clickable items like “in progress”.",
+                "Internal path (e.g. /loop-font) or external URL. Leave empty for non-clickable items like “in progress”.",
+              validation: (Rule) =>
+                Rule.uri({
+                  allowRelative: true,
+                  scheme: ["http", "https", "mailto", "tel"],
+                }),
             }),
           ],
           preview: {
@@ -68,29 +73,10 @@ export const fontsPage = defineType({
         "Typography written in code. Built with p5.js and developed through AI-assisted workflows, these fonts exist as systems rather than static designs. They are variable, unstable, and deliberately open-ended.\n\nThey oscillate between function and expression—between readable text and abstract pattern.\n\nAt times they communicate. At times they refuse.\n\nEvery typeface creates its own space: a space for experimentation and exploration. What remains, when readability disappears, is rhythm, structure, and form.\n\nThis project is an ongoing exploration of those limits.\n\nGerhard Kirchschlaeger\nBahnhofplatz 1\nAustria\nAT\ngerhard@kirchschlaeger.at",
     }),
     defineField({
-      name: "columns",
-      title: "Image columns",
-      type: "object",
-      fields: [
-        defineField({
-          name: "left",
-          title: "Left column images",
-          type: "array",
-          of: [defineArrayMember({ type: "fontImageItem" })],
-        }),
-        defineField({
-          name: "middle",
-          title: "Middle column images",
-          type: "array",
-          of: [defineArrayMember({ type: "fontImageItem" })],
-        }),
-        defineField({
-          name: "right",
-          title: "Right column images",
-          type: "array",
-          of: [defineArrayMember({ type: "fontImageItem" })],
-        }),
-      ],
+      name: "images",
+      title: "Images",
+      type: "array",
+      of: [defineArrayMember({ type: "fontImageItem" })],
     }),
   ],
 });

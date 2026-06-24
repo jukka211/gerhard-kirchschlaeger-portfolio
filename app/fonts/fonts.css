@@ -1,123 +1,83 @@
 .fonts-page {
+    position: relative;
     width: 100%;
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: start;
-    gap: 2vw;
-    padding: 10px 2vw 0vw 2vw;
-    
+    height: 100vh;
+    overflow: hidden;
+    padding: 10px;
+    font-size: 0.85rem;
+    line-height: 1.15;
     background: rgb(0, 0, 0);
     color: rgb(255, 255, 255);
   }
-  
-  .fonts-column {
+
+  .fonts-header {
+    position: absolute;
+    top: 10px;
+    left: 0;
     width: 100%;
-    min-width: 0;
+    z-index: 5;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
   }
-  
-  .fonts-column--left {
-    gap: 2rem;
-  }
-  
+
   .fonts-nav {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    font-family: Georgia, "Times New Roman", Times, serif;
-    font-size: 16px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0rem 2.5rem 0rem 2.5rem;
+    gap: 6rem;
+    font-size: 0.85rem;
     line-height: 1.15;
   }
-  
+
   .fonts-nav a,
   .fonts-nav span {
     color: rgb(255, 255, 255);
     text-decoration: none;
   }
-  
+
   .fonts-nav a:hover {
     text-decoration: underline;
   }
-  
+
   .fonts-info {
     width: 100%;
-    max-width: 34rem;
-    font-size: 16px;
-    line-height: 1.15;
+    margin: 0 auto;
   }
-  
-  .fonts-info summary {
-    cursor: pointer;
-    list-style: none;
-    font-family: Georgia, "Times New Roman", Times, serif;
-  }
-  
-  .fonts-info summary::-webkit-details-marker {
-    display: none;
-  }
-  
-  .fonts-info div {
-    margin-top: 1rem;
-  }
-  
+
   .fonts-info p {
-    margin: 0 0 1em;
+    margin: 0;
   }
-  
-  .fonts-images {
+
+  .fonts-canvas {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    height: 100%;
+    overflow: hidden;
   }
-  
+
   .font-image {
-    margin-left: 0;
-    margin-right: 0;
+    margin: 0;
     padding: 0;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
   }
-  
+
+  .font-image.is-dragging {
+    cursor: grabbing;
+    z-index: 10;
+  }
+
   .font-image img {
     display: block;
     width: 100%;
     height: auto;
-  }
-  
-  .font-image--small {
-    width: 35%;
-  }
-  
-  .font-image--medium {
-    width: 65%;
-  }
-  
-  .font-image--large {
-    width: 100%;
-  }
-  
-  @media (max-width: 768px) {
-    .fonts-page {
-      grid-template-columns: 1fr;
-      gap: 4rem;
-    }
-  
-    .fonts-column--left {
-      gap: 2rem;
-    }
-  
-    .font-image--small {
-      width: 45%;
-    }
-  
-    .font-image--medium {
-      width: 75%;
-    }
-  
-    .font-image--large {
-      width: 100%;
-    }
+    -webkit-user-drag: none;
   }

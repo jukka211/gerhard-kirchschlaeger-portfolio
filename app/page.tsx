@@ -1,48 +1,49 @@
 import Link from "next/link";
 
+import { sanityFetch } from "@/sanity/lib/live";
+import { homePageQuery } from "@/sanity/lib/queries";
+import type { HomePageData } from "@/types/sanity";
+import HomeSlideshow from "./HomeSlideshow";
+
 const useInternalLinks =
   process.env.NODE_ENV === "development" ||
   process.env.VERCEL_ENV === "preview";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { data } = (await sanityFetch({
+    query: homePageQuery,
+  })) as { data: HomePageData | null };
+
+  const slides = (data?.backgroundSlides ?? [])
+    .filter((slide) => slide.asset?.url)
+    .map((slide) => ({
+      key: slide._key,
+      url: slide.asset!.url!,
+      alt: slide.alt || "",
+    }));
+
   return (
     <main className="home-page">
-      <div className="home-bg home-bg--about">
-        <img src="/home-bg/about.svg" alt="" />
-      </div>
-
-      <div className="home-bg home-bg--portfolio">
-      <img src="/home-bg/portfolio.svg" alt="" />
-      </div>
-
-      <div className="home-bg home-bg--play">
-        <video src="/home-bg/play.mp4" autoPlay muted loop playsInline />
-      </div>
-
-      <div className="home-bg home-bg--fonts">
-        <img src="/home-bg/fonts.svg" alt="" />
-      </div>
+      <HomeSlideshow slides={slides} />
 
       <nav className="home-nav" aria-label="Main navigation">
-      <div className="home-title">
-          gerhard kirchschlaeger
-          </div>
+
 
         <div className="home-main-links">
           <Link href="/about" className="home-link home-link--about">
-            about
+          about
           </Link>
 
           <Link href="/portfolio" className="home-link home-link--portfolio">
-  portfolio
+          portfolio
 </Link>
 
           <Link href="/play" className="home-link home-link--play">
-            play
+          play
           </Link>
 
           <Link href="/fonts" className="home-link home-link--fonts">
-  fonts
+          fonts
 </Link>
         </div>
 
@@ -58,22 +59,21 @@ export default function HomePage() {
           <a href="mailto:gerhard@kirchschlaeger.at">mail</a>
 
           <a href="tel:+436763140568">phone</a>
-        </div>
-
-        <div className="home-secondary-links">
           <a
             href="https://instagram.com/gerhard.kirchschlaeger"
             target="_blank"
             rel="noreferrer"
           >
-            instagram
+            inst.
           </a>
+        </div>
 
-          <Link href="/impressum-privacy-policy#imprint">imprint</Link>
+        <div className="home-secondary-links">
+      
 
-          <Link href="/impressum-privacy-policy#privacy-policy">
-            privacy policy
-          </Link>
+          <Link href="/impressum-privacy-policy#imprint">legal</Link>
+
+
         </div>
       </nav>
     </main>

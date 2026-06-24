@@ -30,8 +30,17 @@ export type GalleryItem = {
   };
 };
 
+export type BackgroundSlide = {
+  _key: string;
+  alt?: string;
+  asset?: {
+    url?: string;
+  };
+};
+
 export type HomePageData = {
   title?: string;
+  backgroundSlides?: BackgroundSlide[];
   galleryItems?: GalleryItem[];
 };
 
@@ -40,8 +49,6 @@ export type FontImageSize = "small" | "medium" | "large";
 export type FontImageItem = {
   _key: string;
   size?: FontImageSize;
-  marginTopVh?: number;
-  marginBottomVh?: number;
   image?: SanityImage;
 };
 
@@ -56,9 +63,5 @@ export type FontsPageData = {
   navLinks?: FontNavLink[];
   introTitle?: string;
   introText?: string;
-  columns?: {
-    left?: FontImageItem[];
-    middle?: FontImageItem[];
-    right?: FontImageItem[];
-  };
+  images?: FontImageItem[];
 };

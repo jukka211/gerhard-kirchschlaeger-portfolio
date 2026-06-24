@@ -3,28 +3,38 @@ import "./fonts.css";
 import { sanityFetch } from "@/sanity/lib/live";
 import { fontsPageQuery } from "@/sanity/lib/queries";
 import type { FontImageItem, FontsPageData } from "@/types/sanity";
+import DraggableImage from "./DraggableImage";
 
-function clampVh(value?: number) {
-  if (typeof value !== "number") return 0;
-  return Math.min(Math.max(value, 0), 100);
+const SIZE_WIDTH_PERCENT: Record<string, number> = {
+  small: 16,
+  medium: 26,
+  large: 38,
+};
+
+function randomPosition(widthPercent: number) {
+  const left = Math.random() * (100 - widthPercent - 4) + 2;
+  const top = Math.random() * (100 - widthPercent * 0.6 - 8) + 4;
+  return { top, left };
 }
 
 function FontImage({ item }: { item: FontImageItem }) {
   if (!item.image?.asset?.url) return null;
 
-  const marginTop = clampVh(item.marginTopVh);
-  const marginBottom = clampVh(item.marginBottomVh);
+  const widthPercent = SIZE_WIDTH_PERCENT[item.size || "medium"];
+  const { top, left } = randomPosition(widthPercent);
 
   return (
-    <figure
-      className={`font-image font-image--${item.size || "medium"}`}
+    <DraggableImage
+      className="font-image"
       style={{
-        marginTop: `${marginTop}vh`,
-        marginBottom: `${marginBottom}vh`,
+        position: "absolute",
+        top: `${top}%`,
+        left: `${left}%`,
+        width: `${widthPercent}%`,
       }}
-    >
-      <img src={item.image.asset.url} alt={item.image.alt || ""} />
-    </figure>
+      src={item.image.asset.url}
+      alt={item.image.alt || ""}
+    />
   );
 }
 
@@ -35,75 +45,41 @@ export default async function FontsPage() {
 
   const page = data ?? {
     navLinks: [],
-    introTitle: "■ Info >",
     introText: "",
-    columns: {
-      left: [],
-      middle: [],
-      right: [],
-    },
+    images: [],
   };
 
-  const leftImages = page.columns?.left ?? [];
-  const middleImages = page.columns?.middle ?? [];
-  const rightImages = page.columns?.right ?? [];
+  const images = page.images ?? [];
 
   return (
     <main className="fonts-page">
-      <section className="fonts-column fonts-column--left">
+      <header className="fonts-header">
         <nav className="fonts-nav" aria-label="Fonts navigation">
-          {page.navLinks?.map((link) => {
-            if (link.url) {
-              return (
-                <a
-                  key={link._key}
-                  href={link.url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  □ {link.label}
-                </a>
-              );
-            }
-
-            return <span key={link._key}>□ {link.label}</span>;
-          })}
+          {page.navLinks?.map((link) =>
+            link.url ? (
+              <a key={link._key} href={link.url}>
+                {link.label}
+              </a>
+            ) : (
+              <span key={link._key}>{link.label}</span>
+            ),
+          )}
         </nav>
 
-        <details className="fonts-info">
-          <summary>{page.introTitle || "■ Info &gt;"}</summary>
+        {page.introText && (
+          <div className="fonts-info">
+            {page.introText.split("\n").map((line, index) => (
+              <p key={`${line}-${index}`}>{line}</p>
+            ))}
+          </div>
+        )}
+      </header>
 
-          {page.introText && (
-            <div>
-              {page.introText.split("\n").map((line, index) => (
-                <p key={`${line}-${index}`}>{line}</p>
-              ))}
-            </div>
-          )}
-        </details>
-
-        <div className="fonts-images">
-          {leftImages.map((item) => (
-            <FontImage key={item._key} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="fonts-column">
-        <div className="fonts-images">
-          {middleImages.map((item) => (
-            <FontImage key={item._key} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="fonts-column">
-        <div className="fonts-images">
-          {rightImages.map((item) => (
-            <FontImage key={item._key} item={item} />
-          ))}
-        </div>
-      </section>
+      <div className="fonts-canvas">
+        {images.map((item) => (
+          <FontImage key={item._key} item={item} />
+        ))}
+      </div>
     </main>
   );
 }
