@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSiteMenu } from "@/components/SiteMenuContext";
 
 type Slide = {
   key: string;
@@ -10,24 +11,25 @@ type Slide = {
 
 export default function HomeSlideshow({ slides }: { slides: Slide[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isOn, setIsOn] = useState(true);
+  const { setOpen } = useSiteMenu();
 
   useEffect(() => {
-    if (!isOn || slides.length < 2) return;
+    if (slides.length < 2) return;
 
     const interval = setInterval(() => {
+      if (document.hidden) return;
       setActiveIndex((index) => (index + 1) % slides.length);
     }, 200);
 
     return () => clearInterval(interval);
-  }, [isOn, slides.length]);
+  }, [slides.length]);
 
   if (slides.length === 0) return null;
 
   return (
     <div
-      className={`home-slideshow ${isOn ? "" : "home-slideshow--off"}`.trim()}
-      onClick={() => setIsOn((on) => !on)}
+      className="home-slideshow"
+      onClick={() => setOpen(true)}
       role="presentation"
     >
       {slides.map((slide, index) => (

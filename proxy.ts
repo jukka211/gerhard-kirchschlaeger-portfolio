@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ROOT_DOMAIN = "gerhardkirchschlaeger.at";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get("host")?.split(":")[0] || "";
   const pathname = url.pathname;

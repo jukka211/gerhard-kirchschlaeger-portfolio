@@ -5,11 +5,14 @@ export default function AboutPage() {
   return (
     <div className="about-sheet">
       <Link href="/" className="back-button">
-     (x)
+   
       </Link>
 
       <main className="about">
         <section className="about-row">
+        <p>
+            Gerhard Kirchschläger
+          </p>
           <p>
             Our focus is on conceptual and systemic design. Typography serves as
             our starting point for distinctive visual systems.

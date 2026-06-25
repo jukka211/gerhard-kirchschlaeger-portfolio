@@ -1,14 +1,147 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function ImpressumPrivacyPolicyPage() {
+  const [columnCount, setColumnCount] = useState(3);
+
+  const handleClick = () => {
+    setColumnCount((count) => (count >= 6 ? 1 : count + 1));
+  };
+
   return (
     <div className={styles.page}>
       <Link href="/" className={styles.back} aria-label="Back to homepage">
-        (x)
+
       </Link>
 
-      <main id="imprint" className={styles.text}>
+      <main
+        id="imprint"
+        className={styles.text}
+        style={{ "--column-count": columnCount } as React.CSSProperties}
+        onClick={handleClick}
+      >
+      <h1>Impressum</h1>
+
+<p>Angaben gemäß § 5 ECG und § 24 Mediengesetz</p>
+
+<p>
+  Gerhard Kirchschläger, Bahnhofplatz 1, 4600 Wels, Österreich
+</p>
+<p>
+  Telefon: +43 676 3140568, E-Mail: gerhard@kirchschlaeger.at
+</p>
+
+<h2>Unternehmensgegenstand</h2>
+<p>Grafik-Design</p>
+
+<h2>UID-Nummer</h2>
+<p>ATU49887500</p>
+
+<h2>Kammer / Berufsrecht</h2>
+<p>Mitglied der Wirtschaftskammer Österreich (WKÖ)</p>
+<p>Gewerbe: Grafik-Design</p>
+<p>
+  Gewerbeordnung: abrufbar unter https://www.ris.bka.gv.at
+</p>
+<p>Zuständige Aufsichtsbehörde: Bezirkshauptmannschaft Wels</p>
+<p>Gerichtsstand Wels</p>
+
+<h2>Anwendbare Rechtsvorschriften</h2>
+<p>
+  Gewerbeordnung (GewO), abrufbar unter https://www.ris.bka.gv.at
+</p>
+
+<h2>Haftung für Inhalte</h2>
+<p>
+  Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die
+  Richtigkeit, Vollständigkeit und Aktualität der Inhalte wird jedoch keine
+  Gewähr übernommen.
+</p>
+
+<h2>Haftung für Links</h2>
+<p>
+  Diese Website enthält Links zu externen Websites Dritter, auf deren
+  Inhalte kein Einfluss besteht. Für diese fremden Inhalte wird keine
+  Haftung übernommen.
+</p>
+
+<h2>Urheberrecht</h2>
+<p>
+  Die Inhalte und Werke auf dieser Website unterliegen dem Urheberrecht.
+  Jede Art der Vervielfältigung, Bearbeitung, Verbreitung und Verwertung
+  außerhalb der Grenzen des Urheberrechts bedarf der vorherigen
+  schriftlichen Zustimmung.
+</p>
+
+<h2>AGB</h2>
+<p>
+  Es gelten die Allgemeinen Geschäftsbedingungen (AGB) in ihrer jeweils
+  gültigen Fassung.
+</p>
+
+<h2>Typografie</h2>
+<p>
+  OO Arketa https://www.outline-online.com/product/arketa
+</p>
+
+<h1 id="imprint-en">Imprint</h1>
+
+<p>Information pursuant to § 5 ECG and § 24 Media Act (Austria)</p>
+
+<p>Gerhard Kirchschläger, Bahnhofplatz 1, 4600 Wels, Austria</p>
+<p>Phone: +43 676 3140568, Email: gerhard@kirchschlaeger.at</p>
+
+<h2>Business Purpose</h2>
+<p>Graphic Design</p>
+
+<h2>VAT №</h2>
+<p>ATU49887500</p>
+
+<h2>Chamber / Professional Regulations</h2>
+<p>
+  Member of the Wirtschaftskammer Österreich (Austrian Federal Economic
+  Chamber—WKÖ)
+</p>
+<p>Trade: Graphic Design</p>
+<p>
+  Applicable legislation: Austrian Trade Regulation Act (Gewerbeordnung),
+  available at https://www.ris.bka.gv.at
+</p>
+<p>Supervisory authority: District Authority of Wels</p>
+<p>Place of Jurisdiction: Wels, Austria</p>
+
+<h2>Liability for Content</h2>
+<p>
+  The contents of this website have been created with the greatest
+  possible care. However, no guarantee is given for the accuracy,
+  completeness or timeliness of the content.
+</p>
+
+<h2>Liability for Links</h2>
+<p>
+  This website contains links to external third-party websites over whose
+  content we have no control. Therefore, we cannot assume any liability
+  for these external contents.
+</p>
+
+<h2>Copyright</h2>
+<p>
+  The content and works on this website are subject to copyright law. Any
+  duplication, processing, distribution or any form of commercialization
+  beyond the scope of copyright law requires prior written consent.
+</p>
+
+<h2>Terms and Conditions</h2>
+<p>The applicable Terms and Conditions (AGB) apply in their current version.</p>
+<p>This website is operated from Austria and subject to Austrian law.</p>
+
+<h2>Typography</h2>
+<p>
+  OO Arketa https://www.outline-online.com/product/arketa
+</p>
         <h1>Datenschutzerklärung</h1>
 
         <h2>1. Verantwortlicher</h2>
