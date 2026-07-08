@@ -61,17 +61,33 @@ color: rgb(0,0,0, 0.5);
   }
   
   .about-row:hover {
-    font-size: 8rem;
+    font-size: 6rem;
     line-height: 0.8;
   }
-  
+
+  /* Large desktop displays (e.g. external Mac monitors) scale up further */
+  @media (min-width: 1920px) {
+    .back-button {
+      font-size: clamp(1.2rem, 1vw, 1.6rem);
+    }
+
+    .about-row {
+      font-size: clamp(0.85rem, 0.71vw, 1.3rem);
+    }
+
+    .about-row:hover {
+      font-size: clamp(6rem, 5vw, 10rem);
+    }
+  }
+
   @media (max-width: 768px) {
     .about-row {
-      font-size: 1.8rem;
+      font-size:0.9rem;
       transition: font-size 0.5s ease;
+      padding: 0 1rem;
     }
-  
+
     .about-row:hover {
-      font-size: 6rem;
+      font-size: clamp(3rem, 14vw, 6rem);
     }
   }

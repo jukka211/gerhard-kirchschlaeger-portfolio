@@ -10,9 +10,6 @@ export default function AboutPage() {
 
       <main className="about">
         <section className="about-row">
-        <p>
-            Gerhard Kirchschläger
-          </p>
           <p>
             Our focus is on conceptual and systemic design. Typography serves as
             our starting point for distinctive visual systems.

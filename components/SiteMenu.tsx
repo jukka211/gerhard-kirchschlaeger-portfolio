@@ -1,19 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useSiteMenu } from "@/components/SiteMenuContext";
 
 export default function SiteMenu() {
   const { open, setOpen } = useSiteMenu();
-  const pathname = usePathname();
-  const isFontsPage = pathname?.startsWith("/fonts");
 
   return (
     <div className="site-menu">
       <div
         className={`site-menu-panel ${open ? "is-open" : ""}`.trim()}
         aria-hidden={!open}
+        onClick={() => setOpen(false)}
       >
         <div className="site-menu-panel-inner">
           <div className="site-menu-links">
@@ -51,15 +49,17 @@ export default function SiteMenu() {
         </div>
       </div>
 
-      <button
-        type="button"
-        className={`site-menu-button ${open ? "is-open" : ""} ${isFontsPage ? "is-inverted" : ""}`.trim()}
-        aria-label={open ? "Close menu" : "Open menu"}
-        aria-expanded={open}
-        onClick={() => setOpen(!open)}
-      >
-        <img src="/menu.svg" alt="" />
-      </button>
+      {!open && (
+        <button
+          type="button"
+          className="site-menu-button"
+          aria-label="Open menu"
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+        >
+          <a>menu</a>
+        </button>
+      )}
     </div>
   );
 }

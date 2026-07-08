@@ -60,9 +60,13 @@ p {
 .home-slideshow {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: 10003;
   overflow: hidden;
-  cursor: pointer;
+  cursor: none;
+}
+
+.home-slideshow--mobile {
+  display: none;
 }
 
 .home-slideshow-slide {
@@ -83,32 +87,34 @@ p {
   display: block;
 }
 
-/* Global floating menu */
-
-.site-menu {
+.home-slideshow-cursor {
   position: fixed;
-  inset: 0;
-  z-index: 10002;
+  top: 0;
+  left: 0;
+  z-index: 1;
   pointer-events: none;
+  color: rgb(255, 255, 255);
+  mix-blend-mode: difference;
+  font-size: 0.9rem;
+  text-transform: lowercase;
+  white-space: nowrap;
 }
 
+/* Global floating menu */
+
 .site-menu-panel {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  overflow: hidden;
-  display: flex;
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10010;
   align-items: center;
   justify-content: center;
-  background: rgb(255, 255, 255);
-  transition: height 0.45s ease;
+  background: rgba(255, 255, 255, 0.97);
   pointer-events: none;
 }
 
 .site-menu-panel.is-open {
-  height: 100vh;
+  display: flex;
   pointer-events: auto;
 }
 
@@ -117,7 +123,7 @@ p {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.8rem;
+  gap: 0.4rem;
   text-align: center;
   color: rgb(0, 0, 0);
   font-size: 0.85rem;
@@ -128,7 +134,7 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.8rem;
+  gap: 0.5rem;
 }
 
 .site-menu-links--contact {
@@ -139,46 +145,40 @@ p {
 }
 
 .site-menu-links a:hover {
-  text-decoration: underline;
+text-decoration: underline;
 }
 
 .site-menu-button {
-  position: absolute;
-  bottom: 1rem;
+  position: fixed;
+  bottom: 0.5rem;
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
+  margin-left: -1.75rem;
+  z-index: 10011;
   flex-shrink: 0;
   width: 3.5rem;
-  height: 3.5rem;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   pointer-events: auto;
-  transition: all 0.2s ease;
-  transform-origin: center;
   border: none;
+  color: rgb(255, 255, 255);
+  mix-blend-mode: difference;
 }
 
-.site-menu-button:hover {
-  scale: 1.05;
+body:has(.home-page) .site-menu-button {
+  bottom: 50%;
 }
 
-.site-menu-button img {
-  width: 2rem;
-  height: 2rem;
-  display: block;
-  transition: transform 0.3s ease;
+.site-menu-button:hover a {
+  text-decoration: underline;
 }
 
-.site-menu-button.is-inverted:not(.is-open) img {
-  filter: invert(1);
-}
-
-.site-menu-button.is-open img {
-  transform: rotate(-180deg);
+.site-menu-button a {
+  color: inherit;
+  font-size: 0.9rem;
+  text-transform: lowercase;
 }
 
 /* Portfolio slider */
@@ -242,14 +242,18 @@ p {
     padding: 1rem;
   }
 
-  .site-menu-panel-inner {
-    font-size: 0.85rem;
-    line-height: 1.15;
-    gap: 2.5rem;
+  .home-slideshow--desktop {
+    display: none;
   }
 
-  .site-menu-links,
-  .site-menu-links--contact {
-    gap: 1.6rem;
+  .home-slideshow--mobile {
+    display: block;
   }
+
+  .site-menu-button {
+    position: fixed;
+    bottom: 0rem;
+    left: 50%;
+  }
+
 }

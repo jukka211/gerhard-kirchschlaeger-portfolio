@@ -40,7 +40,8 @@ export type BackgroundSlide = {
 
 export type HomePageData = {
   title?: string;
-  backgroundSlides?: BackgroundSlide[];
+  desktopSlides?: BackgroundSlide[];
+  mobileSlides?: BackgroundSlide[];
   galleryItems?: GalleryItem[];
 };
 

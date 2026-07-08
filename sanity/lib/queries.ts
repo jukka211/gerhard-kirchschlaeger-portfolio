@@ -3,7 +3,14 @@ import { groq } from "next-sanity";
 export const homePageQuery = groq`
   *[_type == "homePage"][0]{
     title,
-    backgroundSlides[]{
+    desktopSlides[]{
+      _key,
+      alt,
+      asset->{
+        url
+      }
+    },
+    mobileSlides[]{
       _key,
       alt,
       asset->{

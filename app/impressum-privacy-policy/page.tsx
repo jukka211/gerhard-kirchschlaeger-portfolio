@@ -8,7 +8,7 @@ export default function ImpressumPrivacyPolicyPage() {
   const [columnCount, setColumnCount] = useState(3);
 
   const handleClick = () => {
-    setColumnCount((count) => (count >= 6 ? 1 : count + 1));
+    setColumnCount((count) => (count >= 12 ? 1 : count + 1));
   };
 
   return (
