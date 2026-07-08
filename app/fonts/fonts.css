@@ -22,7 +22,10 @@
     text-align: center;
     gap: 0.5rem;
   }
-
+  ::selection {
+    color: black;
+    background-color: rgb(255, 255, 255);
+  }
   .fonts-nav {
     display: flex;
     flex-direction: row;
@@ -45,12 +48,60 @@
     text-decoration: underline;
   }
 
-  .fonts-info {
-    width: 100%;
-    margin: 0 auto;
+  .fonts-info-button {
+    position: fixed;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10011;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    pointer-events: auto;
+    color: rgb(255, 255, 255);
+    mix-blend-mode: difference;
+    font-size: 0.9rem;
+    text-transform: lowercase;
   }
 
-  .fonts-info p {
+  .fonts-info-button:hover {
+    text-decoration: underline;
+  }
+
+  .fonts-info-panel {
+    position: fixed;
+    top: 1rem;
+    left: 6rem;
+    right: 6rem;
+    bottom: 0;
+    z-index: 10005;
+    display: flex;
+    flex-direction: column;
+    background: rgb(0, 0, 0,0);
+    color: rgb(255, 255, 255);
+    transform: translateY(100%);
+    transition: transform 0.35s ease;
+    pointer-events: none;
+    mix-blend-mode: difference;
+  }
+
+  .fonts-info-panel.is-open {
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .fonts-info-panel-inner {
+    height: 100%;
+    overflow-y: auto;
+    font-size: 4rem;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .fonts-info-panel-inner p {
     margin: 0;
   }
 

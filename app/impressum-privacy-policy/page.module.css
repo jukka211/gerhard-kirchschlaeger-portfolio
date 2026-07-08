@@ -26,40 +26,136 @@
 }
 
 .text {
-  column-count: var(--column-count, 3);
-  column-gap: 1rem;
-  column-fill: auto;
   width: 100%;
   height: 100vh;
-  padding-top: 0.6rem;
-  overflow-x: auto;
-  overflow-y: hidden;
+  padding-top: 1.5rem;
   font-size: 0.85rem;
   line-height: 1.2;
   text-align: center;
+  --mx: 0.5;
+  --my: 0;
+  --focus: -5;
 }
 
-.text h1,
-.text h2 {
-  break-after: avoid;
+/* default / columns modes keep the original multi-column reading layout */
+.text:global(.mode-default),
+.text:global(.mode-columns) {
+  column-gap: 1rem;
+  column-fill: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.text:global(.mode-default) {
+  column-count: 3;
+}
+
+.text:global(.mode-columns) {
+  column-count: 8;
+}
+
+/* the rest are stepped through by clicking "(↺)" on the site menu */
+.text:global(.mode-focus),
+.text:global(.mode-fontsize),
+.text:global(.mode-converge),
+.text:global(.mode-wave),
+.text:global(.mode-cascade),
+.text:global(.mode-lineheight) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  height: auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.text:global(.mode-marquee) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: max-content;
+  height: 100vh;
+  overflow: hidden;
+  animation: legal-marquee 40s linear infinite;
+  will-change: transform;
+}
+
+.legalRow {
+  --i: 0;
+  --rotdir: 1;
+  --dist: max(calc(var(--i) - var(--focus)), calc(var(--focus) - var(--i)));
+  display: block;
+  width: 100%;
+  margin: 0;
   font-size: inherit;
   line-height: inherit;
+  break-after: avoid;
+  overflow-wrap: break-word;
+  transition: all 0.3s ease-in-out;
 }
 
-.text h1 {
-  margin: 0rem;
+.text:global(.mode-focus) .legalRow {
+  font-size: max(0.5rem, calc(3rem - min(var(--dist), 40) * 0.5rem));
+  letter-spacing: max(-0.4em, calc(min(var(--dist), 40) * -0.02em));
 }
 
-.text h2 {
-  margin: 0rem;
+.text:global(.mode-fontsize) .legalRow:hover {
+  font-size: 4rem;
+  line-height: 1.05;
 }
 
-.text p {
-  margin: 0;
+.text:global(.mode-converge) .legalRow {
+  font-size: calc(0.85rem + min(var(--dist), 20) * 0.3rem);
+  letter-spacing: max(-0.3em, calc(min(var(--dist), 20) * 0.08em));
+  transform: rotate(calc(min(var(--dist), 20) * var(--rotdir) * 4deg));
+}
+
+.text:global(.mode-wave) .legalRow {
+  letter-spacing: max(0em, calc(3em - min(var(--dist), 20) * 0.2em));
+}
+
+.text:global(.mode-cascade) .legalRow {
+  transform: rotate(calc((min(var(--i), 40) + 1) * (var(--mx) - 0.5) * 6deg));
+  transform-origin: left center;
+}
+
+.text:global(.mode-lineheight) .legalRow {
+  margin-top: max(0rem, calc(min(var(--i), 40) * (var(--my) - 0.9) * 0.3rem));
+}
+
+.text:global(.mode-marquee) .legalRow {
+  display: inline-block;
+  width: auto;
+  white-space: nowrap;
+  padding: 0 1.5rem;
+  font-size: max(0.7rem, calc(var(--my) * 3rem));
 }
 
 .text > * {
   overflow-wrap: break-word;
+}
+
+@keyframes legal-marquee {
+  from {
+    transform: translateX(100vw);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legalRow {
+    transition-duration: 0.01ms;
+  }
+
+  .text:global(.mode-marquee) {
+    animation: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -67,7 +163,8 @@
     margin: 0 rem;
   }
 
-  .text {
+  .text:global(.mode-default),
+  .text:global(.mode-columns) {
     column-count: 1;
     height: auto;
     overflow: visible;

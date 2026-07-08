@@ -4,6 +4,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { fontsPageQuery } from "@/sanity/lib/queries";
 import type { FontImageItem, FontsPageData } from "@/types/sanity";
 import DraggableImage from "./DraggableImage";
+import FontsInfoPanel from "./FontsInfoPanel";
 
 const SIZE_WIDTH_PERCENT: Record<string, number> = {
   small: 16,
@@ -65,14 +66,6 @@ export default async function FontsPage() {
             ),
           )}
         </nav>
-
-        {page.introText && (
-          <div className="fonts-info">
-            {page.introText.split("\n").map((line, index) => (
-              <p key={`${line}-${index}`}>{line}</p>
-            ))}
-          </div>
-        )}
       </header>
 
       <div className="fonts-canvas">
@@ -80,6 +73,8 @@ export default async function FontsPage() {
           <FontImage key={item._key} item={item} />
         ))}
       </div>
+
+      <FontsInfoPanel introText={page.introText ?? ""} />
     </main>
   );
 }
