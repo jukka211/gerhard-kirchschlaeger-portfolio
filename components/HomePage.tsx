@@ -88,11 +88,18 @@ export default function HomePage({ items }: Props) {
       setupHorizontalScroll();
     }, 2000);
 
-    window.addEventListener("resize", setupHorizontalScroll);
+    let lastWidth = window.innerWidth;
+    const handleResize = () => {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
+      setupHorizontalScroll();
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
       clearTimeout(fallbackTimer);
-      window.removeEventListener("resize", setupHorizontalScroll);
+      window.removeEventListener("resize", handleResize);
       ScrollTrigger.getAll().forEach((st) => st.kill());
       document.body.style.height = "";
     };
