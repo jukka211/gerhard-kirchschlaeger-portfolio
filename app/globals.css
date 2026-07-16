@@ -159,6 +159,7 @@ p {
 
 .site-menu-links a:hover {
 text-decoration: underline;
+text-underline-offset: 4px;
 }
 
 /* Menu animation modes, stepped through by clicking "(↺)" while the menu is open. */
@@ -288,12 +289,14 @@ body:has(.home-page) .site-menu-button-group {
 
 .site-menu-button:hover a {
   text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .site-menu-button a {
   color: inherit;
   font-size: 0.9rem;
   text-transform: lowercase;
+  transition: all 0.05s ease-in-out;
 }
 
 .site-menu-refresh-button {
@@ -302,29 +305,29 @@ body:has(.home-page) .site-menu-button-group {
   left: 0.5rem;
   z-index: 10011;
   flex-shrink: 0;
-  background: white;
+  background: rgb(0, 0, 0);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   pointer-events: auto;
-  border: 0.5px solid rgb(255, 255, 255);
   border-radius: 20px;
-  padding: 0.1rem 0.5rem;
-  color: rgb(0, 0, 0);
-  mix-blend-mode: difference;
+  padding: 0.2rem 0.2rem;
+  color: rgb(255, 255, 255);
+  transition: all 0.15s ease-in-out;
 }
 .site-menu-refresh-button:hover {
   background: black;
   color: white;
   scale: 1.1;
+  transform: rotate(360deg);
 
 }
 
-.site-menu-refresh-button a {
-  color: inherit;
-  font-size: 1.2rem;
-  text-transform: lowercase;
+.site-menu-refresh-button img {
+  width: 1rem;
+  height: 1rem;
+  display: block;
 }
 
 /* Portfolio slider */

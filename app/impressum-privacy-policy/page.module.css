@@ -138,6 +138,11 @@
   overflow-wrap: break-word;
 }
 
+
+.text h2 {
+  font-weight: 400!important;
+}
+
 @keyframes legal-marquee {
   from {
     transform: translateX(100vw);

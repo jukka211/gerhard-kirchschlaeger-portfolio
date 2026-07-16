@@ -46,6 +46,7 @@
 
   .fonts-nav a:hover {
     text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   .fonts-info-button {
@@ -69,6 +70,7 @@
 
   .fonts-info-button:hover {
     text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   .fonts-info-panel {

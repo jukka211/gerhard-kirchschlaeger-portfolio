@@ -117,17 +117,6 @@ export default function SiteMenu() {
               about
             </Link>
             <Link
-              href="/portfolio"
-              ref={(el) => {
-                linkRefs.current[2] = el;
-              }}
-              data-row-index={2}
-              style={rowStyle(2)}
-              onClick={() => setOpen(false)}
-            >
-              portfolio
-            </Link>
-            <Link
               href="/play"
               ref={(el) => {
                 linkRefs.current[3] = el;
@@ -225,7 +214,7 @@ export default function SiteMenu() {
           aria-label="Next mode"
           onClick={handleRefreshClick}
         >
-          <a>ƒ</a>
+          <img src="/refresh-icon.svg" alt="Next mode" />
         </button>
       )}
 
