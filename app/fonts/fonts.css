@@ -135,3 +135,14 @@
     height: auto;
     -webkit-user-drag: none;
   }
+
+  @media (max-width: 768px) {
+    .fonts-info-panel {
+      left: 1rem;
+      right: 1rem;
+    }
+
+    .fonts-info-panel-inner {
+      font-size: 2rem;
+    }
+  }

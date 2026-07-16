@@ -418,4 +418,9 @@ body:has(.home-page) .site-menu-button-group {
     bottom: 0rem;
   }
 
+  .site-menu-refresh-button img {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
 }
