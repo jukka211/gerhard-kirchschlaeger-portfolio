@@ -137,6 +137,10 @@
   }
 
   @media (max-width: 768px) {
+    .fonts-nav {
+      padding: 0rem 1rem 0rem 1rem;
+    }
+
     .fonts-info-panel {
       left: 1rem;
       right: 1rem;
