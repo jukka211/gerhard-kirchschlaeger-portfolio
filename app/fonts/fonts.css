@@ -115,7 +115,9 @@
 
   @media (max-width: 768px) {
     .fonts-nav {
-      padding: 0rem 1rem 0rem 1rem;
+      padding: 0rem 0.5rem 0rem 0.5rem;
+      gap: 2rem;
+      justify-content: space-between;
     }
 
     .fonts-info-panel {
@@ -124,6 +126,6 @@
     }
 
     .fonts-info-panel-inner {
-      font-size: 2rem;
+      font-size: 1.6rem;
     }
   }
