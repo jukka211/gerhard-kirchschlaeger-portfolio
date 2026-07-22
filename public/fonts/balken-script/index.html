@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <main id="root">
+
+      <div id="canvas-container">
+        <section id="sketch-holder"></section>
+      </div>
+
+      <button id="controls-toggle" class="control-toggle" type="button" aria-expanded="true" aria-controls="controls">
+        Close Controls
+      </button>
+
+      <section id="controls" class="controls open" aria-label="Balken Script Controls">
+        <div class="controls-header">
+          <span>Balken Script</span>
+          <span>Controls</span>
+        </div>
+
+        <label class="control block-control" for="textArea">
+          <span>Text</span>
+          <textarea id="textArea" spellcheck="false" rows="4">Please
+write
+here</textarea>
+        </label>
+
+        <div class="control-grid">
+
+          <label class="slider-control">
+            <span>Size</span>
+            <input id="size" type="range" min="70" max="240" value="150" step="1" />
+            <span class="value" id="size-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Stroke Weight</span>
+            <input id="weight" type="range" min="6" max="60" value="10" step="1" />
+            <span class="value" id="weight-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Block Width</span>
+            <input id="blockWidth" type="range" min="8" max="110" value="24" step="1" />
+            <span class="value" id="blockWidth-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Contrast</span>
+            <input id="contrast" type="range" min="0" max="200" value="155" step="1" />
+            <span class="value" id="contrast-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Slant</span>
+            <input id="slant" type="range" min="-250" max="100" value="-70" step="1" />
+            <span class="value" id="slant-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Tracking</span>
+            <input id="tracking" type="range" min="-80" max="220" value="35" step="1" />
+            <span class="value" id="tracking-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Line Spacing</span>
+            <input id="leading" type="range" min="60" max="220" value="95" step="1" />
+            <span class="value" id="leading-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Readable &rarr; Cryptic</span>
+            <input id="cryptic" type="range" min="0" max="100" value="0" step="1" />
+            <span class="value" id="cryptic-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Cap Height</span>
+            <input id="capHeight" type="range" min="100" max="240" value="100" step="1" />
+            <span class="value" id="capHeight-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Cap Width</span>
+            <input id="capWidth" type="range" min="45" max="200" value="100" step="1" />
+            <span class="value" id="capWidth-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>X-Height</span>
+            <input id="xHeight" type="range" min="70" max="150" value="80" step="1" />
+            <span class="value" id="xHeight-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Ascenders</span>
+            <input id="ascender" type="range" min="70" max="170" value="90" step="1" />
+            <span class="value" id="ascender-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Descenders</span>
+            <input id="descender" type="range" min="70" max="190" value="80" step="1" />
+            <span class="value" id="descender-value"></span>
+          </label>
+
+          <label class="slider-control">
+            <span>Alignment</span>
+            <select id="alignSelect" class="select-control">
+              <option value="Left" selected>Left</option>
+              <option value="Center">Center</option>
+              <option value="Right">Right</option>
+            </select>
+          </label>
+
+        </div>
+
+        <div class="actions">
+          <div class="toggles-row">
+            <label class="toggle-control">
+              <input id="blockMode" type="checkbox" />
+              <span>Block / filled mode</span>
+            </label>
+
+            <label class="toggle-control">
+              <input id="brutalCut" type="checkbox" checked />
+              <span>Brutal cut</span>
+            </label>
+
+            <label class="toggle-control">
+              <input id="monumentalCaps" type="checkbox" checked />
+              <span>Monumental caps</span>
+            </label>
+          </div>
+
+          <div class="export-btns">
+            <button id="exportSvgBtn" type="button">Export Text SVG</button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <script src="sketch.js"></script>
+    <script>
+      // Controls toggle
+      const toggle = document.getElementById('controls-toggle');
+      const controls = document.getElementById('controls');
+      controls.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.textContent = 'Close Controls';
+      toggle.addEventListener('click', () => {
+        const open = controls.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open);
+        toggle.textContent = open ? 'Close Controls' : 'Open Controls';
+      });
+
+      // Live slider value display
+      document.querySelectorAll('input[type="range"]').forEach(input => {
+        const valueEl = document.getElementById(input.id + '-value');
+        if (valueEl) {
+          const update = () => valueEl.textContent = parseFloat(input.value).toFixed(
+            input.step && input.step.includes('.') ? input.step.split('.')[1].length : 0
+          );
+          update();
+          input.addEventListener('input', update);
+        }
+      });
+    </script>
+  </body>
+</html>

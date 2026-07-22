@@ -45,14 +45,6 @@ export type HomePageData = {
   galleryItems?: GalleryItem[];
 };
 
-export type FontImageSize = "small" | "medium" | "large";
-
-export type FontImageItem = {
-  _key: string;
-  size?: FontImageSize;
-  image?: SanityImage;
-};
-
 export type FontNavLink = {
   _key: string;
   label: string;
@@ -64,5 +56,6 @@ export type FontsPageData = {
   navLinks?: FontNavLink[];
   introTitle?: string;
   introText?: string;
-  images?: FontImageItem[];
+  desktopSlides?: BackgroundSlide[];
+  mobileSlides?: BackgroundSlide[];
 };

@@ -7,8 +7,8 @@ import { usePathname } from "next/navigation";
 import { useSiteMenu } from "@/components/SiteMenuContext";
 import { ROW_MODES } from "@/components/rowModes";
 
-const CLOSE_LABEL_ROUTES = ["/about", "/impressum-privacy-policy"];
-const HIDE_BUTTON_ROUTES = ["/fonts"];
+const CLOSE_LABEL_ROUTES = ["/about", "/impressum-privacy-policy", "/fonts"];
+const HIDE_BUTTON_ROUTES: string[] = [];
 const ROT3_ANGLES = [0, 90, 180];
 
 function matchesRoute(pathname: string | null, routes: string[]) {

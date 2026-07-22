@@ -54,20 +54,18 @@ export const fontsPageQuery = groq`
     },
     introTitle,
     introText,
-    images[]{
+    desktopSlides[]{
       _key,
-      size,
-      image{
-        alt,
-        asset->{
-          url,
-          metadata{
-            dimensions{
-              width,
-              height
-            }
-          }
-        }
+      alt,
+      asset->{
+        url
+      }
+    },
+    mobileSlides[]{
+      _key,
+      alt,
+      asset->{
+        url
       }
     }
   }

@@ -2,42 +2,9 @@ import "./fonts.css";
 
 import { sanityFetch } from "@/sanity/lib/live";
 import { fontsPageQuery } from "@/sanity/lib/queries";
-import type { FontImageItem, FontsPageData } from "@/types/sanity";
-import DraggableImage from "./DraggableImage";
+import type { FontsPageData } from "@/types/sanity";
+import HomeSlideshow from "../HomeSlideshow";
 import FontsInfoPanel from "./FontsInfoPanel";
-
-const SIZE_WIDTH_PERCENT: Record<string, number> = {
-  small: 16,
-  medium: 26,
-  large: 38,
-};
-
-function randomPosition(widthPercent: number) {
-  const left = Math.random() * (100 - widthPercent - 4) + 2;
-  const top = Math.random() * (100 - widthPercent * 0.6 - 8) + 4;
-  return { top, left };
-}
-
-function FontImage({ item }: { item: FontImageItem }) {
-  if (!item.image?.asset?.url) return null;
-
-  const widthPercent = SIZE_WIDTH_PERCENT[item.size || "medium"];
-  const { top, left } = randomPosition(widthPercent);
-
-  return (
-    <DraggableImage
-      className="font-image"
-      style={{
-        position: "absolute",
-        top: `${top}%`,
-        left: `${left}%`,
-        width: `${widthPercent}%`,
-      }}
-      src={item.image.asset.url}
-      alt={item.image.alt || ""}
-    />
-  );
-}
 
 export default async function FontsPage() {
   const { data } = (await sanityFetch({
@@ -47,10 +14,21 @@ export default async function FontsPage() {
   const page = data ?? {
     navLinks: [],
     introText: "",
-    images: [],
+    desktopSlides: [],
+    mobileSlides: [],
   };
 
-  const images = page.images ?? [];
+  const toSlides = (slides: FontsPageData["desktopSlides"]) =>
+    (slides ?? [])
+      .filter((slide) => slide.asset?.url)
+      .map((slide) => ({
+        key: slide._key,
+        url: `${slide.asset!.url!}?w=2400&q=75&auto=format`,
+        alt: slide.alt || "",
+      }));
+
+  const desktopSlides = toSlides(page.desktopSlides);
+  const mobileSlides = toSlides(page.mobileSlides);
 
   return (
     <main className="fonts-page">
@@ -68,11 +46,11 @@ export default async function FontsPage() {
         </nav>
       </header>
 
-      <div className="fonts-canvas">
-        {images.map((item) => (
-          <FontImage key={item._key} item={item} />
-        ))}
-      </div>
+      <HomeSlideshow slides={desktopSlides} variant="desktop" />
+      <HomeSlideshow
+        slides={mobileSlides.length > 0 ? mobileSlides : desktopSlides}
+        variant="mobile"
+      />
 
       <FontsInfoPanel introText={page.introText ?? ""} />
     </main>
