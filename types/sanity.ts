@@ -59,3 +59,14 @@ export type FontsPageData = {
   desktopSlides?: BackgroundSlide[];
   mobileSlides?: BackgroundSlide[];
 };
+
+export type AboutRow = {
+  _key: string;
+  text: string;
+  href?: string;
+};
+
+export type AboutPageData = {
+  title?: string;
+  rows?: AboutRow[];
+};

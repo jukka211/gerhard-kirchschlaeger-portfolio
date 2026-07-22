@@ -70,3 +70,14 @@ export const fontsPageQuery = groq`
     }
   }
 `;
+
+export const aboutPageQuery = groq`
+  *[_type == "aboutPage"][0]{
+    title,
+    rows[]{
+      _key,
+      text,
+      href
+    }
+  }
+`;
