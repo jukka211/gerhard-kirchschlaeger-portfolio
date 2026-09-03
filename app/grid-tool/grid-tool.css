@@ -1,0 +1,395 @@
+.gt-page {
+  min-height: 100dvh;
+  width: 100%;
+  background: #0b0b0c;
+  color: #f2f2f2;
+  font-family: "OO Arketa Trial", monospace;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem clamp(1rem, 3vw, 2.5rem);
+}
+
+.gt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  row-gap: 0.75rem;
+}
+
+.gt-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gt-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  text-transform: uppercase;
+  margin-right: 0.25rem;
+}
+
+.gt-btn {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.gt-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.gt-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gt-btn--active {
+  background: #f2f2f2;
+  color: #0b0b0c;
+  border-color: #f2f2f2;
+}
+
+.gt-btn--export {
+  border-color: #6ee7a8;
+  color: #6ee7a8;
+}
+
+.gt-btn--export:hover:not(:disabled) {
+  background: rgba(110, 231, 168, 0.12);
+}
+
+.gt-btn--recording {
+  border-color: #ff5c5c;
+  color: #ff5c5c;
+  animation: gt-pulse 1.4s ease-in-out infinite;
+}
+
+.gt-btn--export:disabled {
+  opacity: 0.7;
+}
+
+@keyframes gt-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.gt-number {
+  width: 4rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.gt-number:disabled {
+  opacity: 0.35;
+}
+
+.gt-hint {
+  font-size: 0.75rem;
+  opacity: 0.55;
+}
+
+.gt-hint--error {
+  color: #ff8080;
+  opacity: 1;
+}
+
+.gt-canvas-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0.5rem 0 1.5rem;
+}
+
+/* The canvas carries the whole preview's palette, so switching the ground
+ * repaints the cells and their chrome with it. --gt-bg is the one colour the
+ * export also paints (see BACKGROUNDS in exportGeometry); the rest exist only
+ * to keep the editing affordances legible against it. */
+.gt-canvas {
+  --gt-bg: #000000;
+  --gt-empty-bg: #17181a;
+  --gt-hairline: rgba(255, 255, 255, 0.08);
+  --gt-ink: rgba(255, 255, 255, 0.75);
+  --gt-ink-line: rgba(255, 255, 255, 0.35);
+  --gt-ink-wash: rgba(255, 255, 255, 0.08);
+
+  position: relative;
+  background: var(--gt-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.gt-canvas--white {
+  --gt-bg: #ffffff;
+  --gt-empty-bg: #ececec;
+  --gt-hairline: rgba(0, 0, 0, 0.1);
+  --gt-ink: rgba(0, 0, 0, 0.7);
+  --gt-ink-line: rgba(0, 0, 0, 0.35);
+  --gt-ink-wash: rgba(0, 0, 0, 0.06);
+}
+
+.gt-aspect-16-9 {
+  aspect-ratio: 16 / 9;
+  width: min(100%, calc(100dvh * 16 / 9));
+}
+
+.gt-aspect-9-16 {
+  aspect-ratio: 9 / 16;
+  width: min(100%, calc(70dvh * 9 / 16));
+}
+
+.gt-aspect-4-5 {
+  aspect-ratio: 4 / 5;
+  width: min(100%, calc(80dvh * 4 / 5));
+}
+
+.gt-aspect-5-4 {
+  aspect-ratio: 5 / 4;
+  width: min(100%, calc(90dvh * 5 / 4));
+}
+
+.gt-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Grid cells */
+
+/* An empty cell sits a shade off the ground so a slot you can still fill
+ * reads as one. That tint is the preview's own: the export draws nothing for a
+ * cell with no media, and the ground shows through. */
+.gt-cell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--gt-empty-bg);
+  border: 0px solid var(--gt-hairline);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gt-cell-toolbar {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.gt-cell:hover .gt-cell-toolbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gt-chip {
+
+  background: rgba(0, 0, 0, 0.6);
+  color: #f2f2f2;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.gt-chip:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.gt-chip--danger {
+  border-color: rgba(255, 92, 92, 0.6);
+  color: #ff8080;
+}
+
+.gt-cell-media {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gt-cell-media img,
+.gt-cell-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gt-cell-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.gt-upload-btn {
+  border: 1px dashed var(--gt-ink-line);
+  background: transparent;
+  color: var(--gt-ink);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.gt-upload-btn:hover {
+  background: var(--gt-ink-wash);
+}
+
+.gt-cell-footer {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  right: 6px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.gt-cell:hover .gt-cell-footer {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gt-media-name {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.gt-file-input {
+  display: none;
+}
+
+
+/* Column and row modes
+ *
+ * Every measurement here comes from stripGeometry as a percentage of the
+ * export canvas, so the preview is the export's own layout at whatever size it
+ * happens to be drawn. Only the scroll is CSS's own: each band is a two-copy
+ * stack sliding by exactly half its length per lap, which lands the second
+ * copy precisely where the first began.
+ *
+ * A column and a row are the same thing at right angles, so they share
+ * everything but which axis is pinned and which one moves. */
+
+.gt-strips {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gt-strip {
+  position: absolute;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* A column is pinned to the top and runs down; a row is pinned to the left and
+ * runs across. Its other two edges come from the band, inline. */
+.gt-strip--vertical {
+  top: 0;
+  animation-name: gt-strip-scroll-y;
+}
+
+.gt-strip--horizontal {
+  left: 0;
+  animation-name: gt-strip-scroll-x;
+}
+
+/* An item spans its band, so it only positions itself along the strip; the
+ * across-axis edges are the band's own. */
+.gt-strip--vertical .gt-strip-item {
+  left: 0;
+  right: 0;
+}
+
+.gt-strip--horizontal .gt-strip-item {
+  top: 0;
+  bottom: 0;
+}
+
+.gt-strip-item {
+  position: absolute;
+}
+
+/* -50% is one copy of the strip, because a .gt-strip holds exactly two (COPIES
+ * in StripStage). Reversing these is what runs a column downward and a row
+ * rightward. */
+@keyframes gt-strip-scroll-y {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes gt-strip-scroll-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* A repeated appearance of a cell: the same media again, with none of the
+ * controls, so it can't be mistaken for a slot of its own. */
+.gt-cell--clone {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-strip {
+    animation: none;
+  }
+}
