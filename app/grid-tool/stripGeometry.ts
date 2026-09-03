@@ -49,6 +49,45 @@ export const MAX_SCROLL_SPEED = 2000;
 export const FALLBACK_RATIO = 16 / 9;
 
 /**
+ * The spacing of a strip layout, in nominal (pre-EXPORT_SCALE) canvas pixels
+ * so the numbers mean the same thing at any scale — the same units
+ * EXPORT_GAP is quoted in.
+ *
+ * The grid derives all three from EXPORT_GAP alone; the scrolling modes hand
+ * them to the user separately, because a column of clips wants different air
+ * around it than a mosaic does.
+ */
+export interface StripSpacing {
+  /** Inset from the two frame edges the strip runs between — a column's left
+   * and right, a row's top and bottom. There is no inset along the axis: that
+   * end of the strip never stops arriving. */
+  padding: number;
+  /** Between consecutive items along a strip. */
+  cellGap: number;
+  /** Between neighbouring bands: two columns, or two rows. */
+  bandGap: number;
+}
+
+export const MIN_STRIP_SPACING = 0;
+export const MAX_STRIP_SPACING = 120;
+
+/**
+ * What the scrolling modes start at: exactly the grid's own spacing, so
+ * switching modes without touching a slider is a change of layout and nothing
+ * else.
+ */
+export const DEFAULT_STRIP_SPACING: StripSpacing = {
+  padding: EXPORT_GAP / 2,
+  cellGap: EXPORT_GAP,
+  bandGap: EXPORT_GAP,
+};
+
+export function clampSpacing(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(MAX_STRIP_SPACING, Math.max(MIN_STRIP_SPACING, Math.round(value)));
+}
+
+/**
  * A ceiling on how many times `repeat` will replicate a band's media.
  *
  * Only a pathologically short band can reach it (a single panorama down a tall
@@ -101,13 +140,18 @@ export interface Strip {
  * so a handful of clips still make a band that's full at every moment of the
  * loop. Without it a short band scrolls its items past once per lap and shows
  * background for the rest.
+ *
+ * `spacing` is the air around and between the items, in nominal pixels; it
+ * defaults to the grid's own spacing, which is what every measurement here
+ * used to be fixed at.
  */
 export function stripLayout(
   ratios: number[],
   aspect: Aspect,
   axis: StripAxis,
   bands: BandCount,
-  repeat: boolean
+  repeat: boolean,
+  spacing: StripSpacing = DEFAULT_STRIP_SPACING
 ): Strip[] {
   const canvas = exportCanvasSize(aspect);
   const vertical = axis === "vertical";
@@ -116,14 +160,19 @@ export function stripLayout(
   const acrossExtent = vertical ? canvas.width : canvas.height;
   const alongExtent = vertical ? canvas.height : canvas.width;
 
-  const gap = EXPORT_GAP * EXPORT_SCALE;
-  const inset = gap / 2;
-  // Half a gap in from each frame edge and a full gap between bands, so the
-  // spacing matches the grid's at every boundary.
-  const thickness = evenRound((acrossExtent - gap - gap * (bands - 1)) / bands);
+  const padding = clampSpacing(spacing.padding) * EXPORT_SCALE;
+  const cellGap = clampSpacing(spacing.cellGap) * EXPORT_SCALE;
+  const bandGap = clampSpacing(spacing.bandGap) * EXPORT_SCALE;
+  // Whatever's left of the frame once the edges and the band gaps have taken
+  // their share, split evenly. Two pixels is the floor: a band thin enough to
+  // round to nothing would divide by zero on the way to an item's length.
+  const thickness = Math.max(
+    2,
+    evenRound((acrossExtent - 2 * padding - bandGap * (bands - 1)) / bands)
+  );
 
   return Array.from({ length: bands }, (_, band): Strip => {
-    const across = evenRound(inset + band * (thickness + gap));
+    const across = evenRound(padding + band * (thickness + bandGap));
 
     const sizes: { index: number; length: number }[] = [];
     for (let index = band; index < ratios.length; index += bands) {
@@ -140,7 +189,7 @@ export function stripLayout(
     // One pass through the band's media, each item followed by a gap — the
     // trailing one included, so the wrap doesn't butt the last item against
     // the first.
-    const passLength = sizes.reduce((total, item) => total + item.length + gap, 0);
+    const passLength = sizes.reduce((total, item) => total + item.length + cellGap, 0);
     const passes = repeat
       ? Math.min(MAX_PASSES, Math.max(1, Math.ceil(alongExtent / passLength)))
       : 1;
@@ -155,7 +204,7 @@ export function stripLayout(
             ? { x: across, y: along, width: thickness, height: length }
             : { x: along, y: across, width: length, height: thickness },
         });
-        along += length + gap;
+        along += length + cellGap;
       }
     }
 

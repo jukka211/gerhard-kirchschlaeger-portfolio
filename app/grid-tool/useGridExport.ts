@@ -9,7 +9,12 @@ import {
   cellPixelRect,
   exportCanvasSize,
 } from "./exportGeometry";
-import { type BandCount, type StripAxis, stripLayout } from "./stripGeometry";
+import {
+  type BandCount,
+  type StripAxis,
+  type StripSpacing,
+  stripLayout,
+} from "./stripGeometry";
 import type { Aspect, MediaType, Rect } from "./gridLayout";
 import type {
   ProbedMedia,
@@ -64,6 +69,8 @@ export type ExportLayout =
       items: ExportStripItem[];
       bands: BandCount;
       repeat: boolean;
+      /** The air around and between the items, in nominal pixels. */
+      spacing: StripSpacing;
       /** Nominal canvas pixels per second; negative runs the strip backwards. */
       speed: number;
     };
@@ -104,7 +111,8 @@ function buildCells(
     aspect,
     layout.axis,
     layout.bands,
-    layout.repeat
+    layout.repeat,
+    layout.spacing
   );
 
   const cells: RenderCell[] = [];

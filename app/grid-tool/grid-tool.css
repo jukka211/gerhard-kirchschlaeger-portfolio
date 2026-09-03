@@ -1,125 +1,470 @@
+/* Grid Tool — interface
+ *
+ * The chrome is a white panel and grey controls, deliberately colourless: the
+ * only colour on the page should be the media you're arranging, so nothing in
+ * the interface competes with the frame you're judging. (The canvas below has
+ * a palette of its own — that one is the export's, not the tool's.)
+ */
+
 .gt-page {
+  --gt-panel-w: 320px;
+
+  /* Interface greys, light to dark. */
+  --gt-ui-bg: #ffffff;
+  --gt-ui-stage: #ebebeb;
+  --gt-ui-sunken: #f5f5f5;
+  --gt-ui-line: #e2e2e2;
+  --gt-ui-line-strong: #c6c6c6;
+  --gt-ui-ink-faint: #9a9a9a;
+  --gt-ui-ink-soft: #6b6b6b;
+  --gt-ui-ink: #141414;
+
+  position: relative;
   min-height: 100dvh;
   width: 100%;
-  background: #0b0b0c;
-  color: #f2f2f2;
+  display: flex;
+  background: var(--gt-ui-stage);
+  color: var(--gt-ui-ink);
   font-family: "OO Arketa Trial", monospace;
+}
+
+/* The control panel
+ *
+ * Fixed rather than in the flow, so hiding it is one transform and the canvas
+ * never reflows through an intermediate width. The stage gives up the same
+ * width in padding while it's open, so the two slide together and the preview
+ * is never behind the panel. */
+
+.gt-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  width: var(--gt-panel-w);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.25rem clamp(1rem, 3vw, 2.5rem);
+  background: var(--gt-ui-bg);
+  border-right: 1px solid var(--gt-ui-line);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+  transition: transform 0.28s ease;
 }
 
-.gt-toolbar {
+.gt-panel[aria-hidden="true"] {
+  transform: translateX(-100%);
+}
+
+.gt-panel-head {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1.5rem;
-  row-gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--gt-ui-line);
 }
 
-.gt-toolbar-group {
+.gt-panel-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.gt-panel-sub {
+  font-size: 0.68rem;
+  color: var(--gt-ui-ink-faint);
+}
+
+.gt-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* Deep enough at the bottom that the last control clears the site's own
+   * floating menu button, which sits in this corner. */
+  padding: 0 1.25rem 4.5rem;
+}
+
+/* Always visible, and it rides the panel's edge so the same button both
+ * hides and brings it back. */
+.gt-panel-tab {
+  position: fixed;
+  top: 1rem;
+  left: calc(var(--gt-panel-w) + 0.75rem);
+  z-index: 25;
+  border: 1px solid var(--gt-ui-line-strong);
+  border-radius: 999px;
+  background: var(--gt-ui-bg);
+  color: var(--gt-ui-ink);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: left 0.28s ease, background 0.12s ease;
+}
+
+.gt-panel-tab:hover {
+  background: var(--gt-ui-sunken);
+}
+
+.gt-page:not(.gt-page--panel) .gt-panel-tab {
+  left: 0.75rem;
+}
+
+/* Sections */
+
+.gt-section {
+  border-top: 1px solid var(--gt-ui-line);
+  padding: 1.15rem 0 0.35rem;
+}
+
+.gt-section:first-child {
+  border-top: 0;
+  padding-top: 1.15rem;
+}
+
+.gt-section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gt-ui-ink-soft);
+}
+
+.gt-section-index {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  background: var(--gt-ui-ink);
+  color: var(--gt-ui-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  letter-spacing: 0;
+}
+
+.gt-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* The settings belonging to whichever mode is selected, boxed so they read as
+ * one thing that swaps out under the mode switch. */
+.gt-subpanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 0.85rem;
+  border: 1px solid var(--gt-ui-line);
+  border-radius: 10px;
+  background: var(--gt-ui-sunken);
+}
+
+/* Fields */
+
+.gt-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 
-.gt-label {
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  opacity: 0.6;
-  text-transform: uppercase;
-  margin-right: 0.25rem;
+.gt-field--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
 }
 
-.gt-btn {
-  border: 1px solid rgba(255, 255, 255, 0.35);
+.gt-field-label {
+  font-size: 0.74rem;
+  color: var(--gt-ui-ink-soft);
+}
+
+.gt-field-control {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gt-field--stacked .gt-field-control {
+  width: 100%;
+}
+
+.gt-field-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.68rem;
+  color: var(--gt-ui-ink-faint);
+}
+
+/* Controls */
+
+.gt-segmented {
+  display: flex;
+  border: 1px solid var(--gt-ui-line-strong);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--gt-ui-bg);
+}
+
+.gt-field--stacked .gt-segmented {
+  width: 100%;
+}
+
+.gt-seg {
+  flex: 1;
+  border: 0;
+  border-left: 1px solid var(--gt-ui-line-strong);
   background: transparent;
-  color: inherit;
-  border-radius: 999px;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.85rem;
+  color: var(--gt-ui-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  padding: 0.45rem 0.6rem;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
-.gt-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
+.gt-seg:first-child {
+  border-left: 0;
 }
 
-.gt-btn:disabled {
-  opacity: 0.35;
+.gt-seg:hover:not(:disabled):not(.gt-seg--on) {
+  background: var(--gt-ui-sunken);
+}
+
+.gt-seg--on {
+  background: var(--gt-ui-ink);
+  color: var(--gt-ui-bg);
+}
+
+.gt-seg:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.gt-btn--active {
-  background: #f2f2f2;
-  color: #0b0b0c;
-  border-color: #f2f2f2;
+.gt-btn {
+  border: 1px solid var(--gt-ui-line-strong);
+  border-radius: 8px;
+  background: var(--gt-ui-bg);
+  color: var(--gt-ui-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.gt-btn:hover:not(:disabled) {
+  background: var(--gt-ui-sunken);
+  border-color: var(--gt-ui-ink-soft);
+}
+
+.gt-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gt-btn--on {
+  background: var(--gt-ui-ink);
+  border-color: var(--gt-ui-ink);
+  color: var(--gt-ui-bg);
+}
+
+.gt-btn--quiet {
+  border-style: dashed;
+  color: var(--gt-ui-ink-soft);
 }
 
 .gt-btn--export {
-  border-color: #6ee7a8;
-  color: #6ee7a8;
+  flex: 1;
+  background: var(--gt-ui-ink);
+  border-color: var(--gt-ui-ink);
+  color: var(--gt-ui-bg);
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
 }
 
 .gt-btn--export:hover:not(:disabled) {
-  background: rgba(110, 231, 168, 0.12);
-}
-
-.gt-btn--recording {
-  border-color: #ff5c5c;
-  color: #ff5c5c;
-  animation: gt-pulse 1.4s ease-in-out infinite;
+  background: #333333;
+  border-color: #333333;
 }
 
 .gt-btn--export:disabled {
-  opacity: 0.7;
-}
-
-@keyframes gt-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.55;
-  }
-}
-
-.gt-number {
-  width: 4rem;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: transparent;
-  color: inherit;
-  border-radius: 999px;
-  padding: 0.4rem 0.7rem;
-  font-family: inherit;
-  font-size: 0.85rem;
-}
-
-.gt-number:disabled {
-  opacity: 0.35;
-}
-
-.gt-hint {
-  font-size: 0.75rem;
-  opacity: 0.55;
-}
-
-.gt-hint--error {
-  color: #ff8080;
+  background: var(--gt-ui-line-strong);
+  border-color: var(--gt-ui-line-strong);
+  color: var(--gt-ui-bg);
   opacity: 1;
 }
 
-.gt-canvas-stage {
+.gt-btn-row,
+.gt-export,
+.gt-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.gt-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.gt-range {
   flex: 1;
+  min-width: 0;
+  height: 2px;
+  margin: 0;
+  border-radius: 2px;
+  background: var(--gt-ui-line-strong);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.gt-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--gt-ui-ink);
+  cursor: pointer;
+}
+
+.gt-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--gt-ui-ink);
+  cursor: pointer;
+}
+
+.gt-range:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gt-slider-value {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.gt-number {
+  width: 3.6rem;
+  border: 1px solid var(--gt-ui-line-strong);
+  border-radius: 6px;
+  background: var(--gt-ui-bg);
+  color: inherit;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.32rem 0.4rem;
+  text-align: right;
+}
+
+.gt-number:disabled {
+  opacity: 0.4;
+}
+
+.gt-unit {
+  font-size: 0.7rem;
+  color: var(--gt-ui-ink-faint);
+}
+
+.gt-progress {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gt-ui-line);
+  overflow: hidden;
+}
+
+.gt-progress-bar {
+  height: 100%;
+  background: var(--gt-ui-ink);
+  transition: width 0.2s linear;
+}
+
+.gt-note {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--gt-ui-ink-faint);
+}
+
+.gt-note--error {
+  color: var(--gt-ui-ink);
+  background: var(--gt-ui-sunken);
+  border-left: 2px solid var(--gt-ui-ink);
+  border-radius: 0 4px 4px 0;
+  padding: 0.4rem 0.55rem;
+}
+
+/* The stage
+ *
+ * --gt-stage-h is the height a canvas can have here; each aspect takes the
+ * width that fills exactly that, so no frame is ever taller than the window. */
+
+.gt-canvas-stage {
+  --gt-stage-h: calc(100dvh - 4rem);
+
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
-  padding: 0.5rem 0 1.5rem;
+  padding: 2rem clamp(1rem, 3vw, 2.5rem);
+  transition: padding-left 0.28s ease;
+}
+
+.gt-page--panel .gt-canvas-stage {
+  padding-left: calc(var(--gt-panel-w) + 2rem);
+}
+
+.gt-aspect-16-9 {
+  aspect-ratio: 16 / 9;
+  width: min(100%, calc(var(--gt-stage-h) * 16 / 9));
+}
+
+.gt-aspect-9-16 {
+  aspect-ratio: 9 / 16;
+  width: min(100%, calc(var(--gt-stage-h) * 9 / 16));
+}
+
+.gt-aspect-4-5 {
+  aspect-ratio: 4 / 5;
+  width: min(100%, calc(var(--gt-stage-h) * 4 / 5));
+}
+
+.gt-aspect-5-4 {
+  aspect-ratio: 5 / 4;
+  width: min(100%, calc(var(--gt-stage-h) * 5 / 4));
+}
+
+/* On a narrow screen there isn't room to stand beside the canvas, so the panel
+ * simply floats over it. */
+@media (max-width: 760px) {
+  .gt-page {
+    --gt-panel-w: min(86vw, 320px);
+  }
+
+  .gt-page--panel .gt-canvas-stage {
+    padding-left: clamp(1rem, 3vw, 2.5rem);
+  }
 }
 
 /* The canvas carries the whole preview's palette, so switching the ground
@@ -138,7 +483,7 @@
   background: var(--gt-bg);
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.14), 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .gt-canvas--white {
@@ -148,26 +493,6 @@
   --gt-ink: rgba(0, 0, 0, 0.7);
   --gt-ink-line: rgba(0, 0, 0, 0.35);
   --gt-ink-wash: rgba(0, 0, 0, 0.06);
-}
-
-.gt-aspect-16-9 {
-  aspect-ratio: 16 / 9;
-  width: min(100%, calc(100dvh * 16 / 9));
-}
-
-.gt-aspect-9-16 {
-  aspect-ratio: 9 / 16;
-  width: min(100%, calc(70dvh * 9 / 16));
-}
-
-.gt-aspect-4-5 {
-  aspect-ratio: 4 / 5;
-  width: min(100%, calc(80dvh * 4 / 5));
-}
-
-.gt-aspect-5-4 {
-  aspect-ratio: 5 / 4;
-  width: min(100%, calc(90dvh * 5 / 4));
 }
 
 .gt-grid {
@@ -391,5 +716,11 @@
 @media (prefers-reduced-motion: reduce) {
   .gt-strip {
     animation: none;
+  }
+
+  .gt-panel,
+  .gt-panel-tab,
+  .gt-canvas-stage {
+    transition: none;
   }
 }

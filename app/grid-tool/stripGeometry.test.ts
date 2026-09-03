@@ -3,9 +3,12 @@ import {
   type BandCount,
   type Strip,
   type StripAxis,
+  type StripSpacing,
   BAND_COUNTS,
   DEFAULT_SCROLL_SPEED,
+  DEFAULT_STRIP_SPACING,
   FALLBACK_RATIO,
+  MAX_STRIP_SPACING,
   stripLayout,
   stripLoopSeconds,
 } from "./stripGeometry";
@@ -285,4 +288,117 @@ describe("BandCount", () => {
     const counts: BandCount[] = [1, 2];
     expect(BAND_COUNTS).toEqual(counts);
   });
+});
+
+describe("stripLayout spacing", () => {
+  /** DEFAULT_STRIP_SPACING with one measurement changed. */
+  function spacing(overrides: Partial<StripSpacing>): StripSpacing {
+    return { ...DEFAULT_STRIP_SPACING, ...overrides };
+  }
+
+  it("defaults to the grid's own spacing when none is given", () => {
+    each(AXES, (axis) => {
+      each(BAND_COUNTS, (bands) => {
+        expect(stripLayout(RATIOS, "16:9", axis, bands, true)).toEqual(
+          stripLayout(RATIOS, "16:9", axis, bands, true, DEFAULT_STRIP_SPACING)
+        );
+      });
+    });
+  });
+
+  it.each(CASES)("insets the bands by the padding (%s, %s)", (axis, aspect) => {
+    const { acrossExtent } = resolve(axis, aspect);
+
+    each([0, 24, 60], (padding) => {
+      const strips = stripLayout(RATIOS, aspect, axis, 2, true, spacing({ padding }));
+      const inset = padding * EXPORT_SCALE;
+      const last = strips[strips.length - 1];
+
+      expect(strips[0].across).toBe(inset);
+      expect(
+        Math.abs(acrossExtent - inset - (last.across + last.thickness))
+      ).toBeLessThanOrEqual(2);
+    });
+  });
+
+  it.each(CASES)("separates neighbouring bands by the band gap (%s, %s)", (axis, aspect) => {
+    each([0, 16, 48], (bandGap) => {
+      const [first, second] = stripLayout(
+        RATIOS,
+        aspect,
+        axis,
+        2,
+        true,
+        spacing({ bandGap })
+      );
+      expect(second.across - (first.across + first.thickness)).toBe(
+        bandGap * EXPORT_SCALE
+      );
+    });
+  });
+
+  it.each(CASES)("separates consecutive items by the cell gap (%s, %s)", (axis, aspect) => {
+    const at = resolve(axis, aspect);
+
+    each([0, 12, 40], (cellGap) => {
+      const [strip] = stripLayout(RATIOS, aspect, axis, 1, false, spacing({ cellGap }));
+
+      for (let i = 1; i < strip.items.length; i++) {
+        const previous = strip.items[i - 1].rect;
+        const current = strip.items[i].rect;
+        expect(at.along(current) - (at.along(previous) + at.span(previous))).toBe(
+          cellGap * EXPORT_SCALE
+        );
+      }
+    });
+  });
+
+  it.each(CASES)("clamps spacing to the range the controls offer (%s, %s)", (axis, aspect) => {
+    const floor = stripLayout(RATIOS, aspect, axis, 2, true, spacing({ padding: 0 }));
+    const ceiling = stripLayout(
+      RATIOS,
+      aspect,
+      axis,
+      2,
+      true,
+      spacing({ padding: MAX_STRIP_SPACING })
+    );
+
+    each([-40, Number.NaN], (bad) => {
+      expect(stripLayout(RATIOS, aspect, axis, 2, true, spacing({ padding: bad }))).toEqual(
+        floor
+      );
+    });
+    expect(
+      stripLayout(RATIOS, aspect, axis, 2, true, spacing({ padding: 10_000 }))
+    ).toEqual(ceiling);
+  });
+
+  it.each(CASES)("keeps a band usable however wide the padding gets (%s, %s)", (axis, aspect) => {
+    // The widest padding the controls allow, on the narrowest frame, with the
+    // bands split two ways — nothing here may collapse to a zero-sized band,
+    // which would divide by zero on the way to an item's length.
+    each(BAND_COUNTS, (bands) => {
+      for (const strip of stripLayout(
+        RATIOS,
+        aspect,
+        axis,
+        bands,
+        true,
+        { padding: MAX_STRIP_SPACING, cellGap: MAX_STRIP_SPACING, bandGap: MAX_STRIP_SPACING }
+      )) {
+        expect(strip.thickness).toBeGreaterThanOrEqual(2);
+        expect(strip.length).toBeGreaterThan(0);
+        for (const { rect } of strip.items) {
+          expect(at(axis, rect)).toBeGreaterThan(0);
+        }
+      }
+    });
+  });
+
+  /** An item's extent along the strip, which is the measurement that can
+   * collapse when the band it spans gets thin. */
+  function at(axis: StripAxis, rect: { width: number; height: number }) {
+    return axis === "vertical" ? rect.height : rect.width;
+  }
 });

@@ -6,6 +6,7 @@ import {
   type BandCount,
   type Strip,
   type StripAxis,
+  type StripSpacing,
   FALLBACK_RATIO,
   stripLayout,
   stripLoopSeconds,
@@ -26,6 +27,8 @@ interface StripStageProps {
   axis: StripAxis;
   bands: BandCount;
   repeat: boolean;
+  /** The air around and between the items, in nominal pixels. */
+  spacing: StripSpacing;
   /** Nominal canvas pixels per second. */
   speed: number;
   direction: ScrollDirection;
@@ -84,6 +87,7 @@ export default function StripStage({
   axis,
   bands,
   repeat,
+  spacing,
   speed,
   direction,
   canRemove,
@@ -101,9 +105,10 @@ export default function StripStage({
         aspect,
         axis,
         bands,
-        repeat
+        repeat,
+        spacing
       ),
-    [aspect, axis, bands, cells, repeat]
+    [aspect, axis, bands, cells, repeat, spacing]
   );
 
   return (

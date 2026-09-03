@@ -11,6 +11,7 @@ import "gridstack/dist/gridstack.css";
 import "./grid-tool.css";
 import GridCellContent from "./GridCellContent";
 import StripStage, { type ScrollDirection } from "./StripStage";
+import { Field, Section, Segmented, Slider, Toggle, type Choice } from "./controls";
 import {
   type Aspect,
   type MediaType,
@@ -29,11 +30,16 @@ import {
 import {
   type BandCount,
   type StripAxis,
+  type StripSpacing,
   BAND_COUNTS,
   DEFAULT_SCROLL_SPEED,
+  DEFAULT_STRIP_SPACING,
   FALLBACK_RATIO,
   MAX_SCROLL_SPEED,
+  MAX_STRIP_SPACING,
   MIN_SCROLL_SPEED,
+  MIN_STRIP_SPACING,
+  clampSpacing,
   stripLayout,
   stripLoopSeconds,
 } from "./stripGeometry";
@@ -64,7 +70,7 @@ const ASPECTS: Aspect[] = ["16:9", "9:16", "4:5", "5:4"];
  */
 type Mode = "grid" | "column" | "row";
 
-const MODES: { value: Mode; label: string }[] = [
+const MODES: Choice<Mode>[] = [
   { value: "grid", label: "Grid" },
   { value: "column", label: "Column" },
   { value: "row", label: "Row" },
@@ -84,13 +90,18 @@ const DIRECTION_LABELS: Record<StripAxis, Record<ScrollDirection, string>> = {
 
 const DIRECTIONS: ScrollDirection[] = ["forward", "backward"];
 
-/** How many bands the current mode is asking for. */
+/** What the axis calls its bands, and the gap between two of them. */
 const BAND_LABEL: Record<StripAxis, string> = {
   vertical: "Columns",
   horizontal: "Rows",
 };
 
-const BACKGROUND_OPTIONS: { value: Background; label: string }[] = [
+const BAND_GAP_LABEL: Record<StripAxis, string> = {
+  vertical: "Gap between columns",
+  horizontal: "Gap between rows",
+};
+
+const BACKGROUND_OPTIONS: Choice<Background>[] = [
   { value: "black", label: "Black" },
   { value: "white", label: "White" },
 ];
@@ -116,15 +127,24 @@ export default function GridTool() {
   /** null until the user types a length of their own, so the field keeps
    * tracking the footage until they take it over. */
   const [durationOverride, setDurationOverride] = useState<number | null>(null);
+  /** The control panel is an overlay you can get out of the way; the canvas
+   * takes the room back while it's hidden. */
+  const [panelOpen, setPanelOpen] = useState(true);
 
   // Shared by both scrolling modes: turning a column layout on its side should
-  // keep how many bands, how fast, and which way you already asked for.
+  // keep how many bands, how fast, which way, and how much air you already
+  // asked for.
   const [bands, setBands] = useState<BandCount>(1);
   const [repeat, setRepeat] = useState(true);
   const [speed, setSpeed] = useState(DEFAULT_SCROLL_SPEED);
   const [direction, setDirection] = useState<ScrollDirection>("forward");
+  const [spacing, setSpacing] = useState<StripSpacing>(DEFAULT_STRIP_SPACING);
 
   const axis = mode === "grid" ? null : STRIP_AXIS[mode];
+
+  const setSpacingValue = useCallback((key: keyof StripSpacing, value: number) => {
+    setSpacing((prev) => ({ ...prev, [key]: clampSpacing(value) }));
+  }, []);
 
   const cellsRef = useRef(cells);
   useEffect(() => {
@@ -159,6 +179,8 @@ export default function GridTool() {
   // Keep GridStack's row pixel height in sync with the rendered canvas box,
   // so GRID_ROWS always exactly fills the aspect-ratio container, and scale
   // the gap so the preview shows the same spacing the export will render.
+  // The observer is also what keeps the grid honest when the control panel
+  // opens or closes and the canvas gets a different amount of room.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || mode !== "grid") return;
@@ -342,11 +364,12 @@ export default function GridTool() {
             items: stripItems,
             bands,
             repeat,
+            spacing,
             // Direction lives in the sign, which is all the renderer needs to
             // know to run the strip the other way.
             speed: direction === "backward" ? -speed : speed,
           },
-    [axis, bands, direction, exportCells, repeat, speed, stripItems]
+    [axis, bands, direction, exportCells, repeat, spacing, speed, stripItems]
   );
 
   /**
@@ -362,10 +385,11 @@ export default function GridTool() {
       aspect,
       axis,
       bands,
-      repeat
+      repeat,
+      spacing
     ).map((strip) => stripLoopSeconds(strip, speed));
     return laps.length ? Math.max(...laps) : null;
-  }, [aspect, axis, bands, repeat, speed, stripItems]);
+  }, [aspect, axis, bands, repeat, spacing, speed, stripItems]);
 
   // Long enough for the longest clip to play through once — or, in a scrolling
   // mode, for the strip to come back round — until the user says otherwise.
@@ -399,178 +423,265 @@ export default function GridTool() {
     rendering: `Rendering… ${Math.round(progress * 100)}%`,
   }[status];
 
+  /** The cell counter and its two buttons, which every mode wants. */
+  const cellControls = (
+    <Field label={`Cells — ${cells.length}/${MAX_CELLS}`} stacked>
+      <div className="gt-btn-row">
+        <button
+          type="button"
+          className="gt-btn"
+          onClick={addCell}
+          disabled={cells.length >= MAX_CELLS}
+        >
+          + Add cell
+        </button>
+        {mode === "grid" && (
+          <button type="button" className="gt-btn" onClick={randomize} disabled={isBusy}>
+            Randomize
+          </button>
+        )}
+      </div>
+    </Field>
+  );
+
   return (
-    <main className="gt-page">
-      <header className="gt-toolbar">
-        <div className="gt-toolbar-group">
-          <span className="gt-label">Aspect</span>
-          {ASPECTS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              className={`gt-btn ${aspect === value ? "gt-btn--active" : ""}`}
-              onClick={() => setAspect(value)}
-              disabled={isBusy}
-              title={`${exportCanvasSize(value).width}×${exportCanvasSize(value).height}`}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
+    <main className={`gt-page ${panelOpen ? "gt-page--panel" : ""}`}>
+      <aside className="gt-panel" aria-hidden={!panelOpen} inert={!panelOpen}>
+        <header className="gt-panel-head">
+          <h1 className="gt-panel-title">Grid Tool</h1>
+          <span className="gt-panel-sub">
+            {exportCanvasSize(aspect).width}×{exportCanvasSize(aspect).height}
+          </span>
+        </header>
 
-        <div className="gt-toolbar-group">
-          <span className="gt-label">BG</span>
-          {BACKGROUND_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              className={`gt-btn ${background === value ? "gt-btn--active" : ""}`}
-              onClick={() => setBackground(value)}
-              disabled={isBusy}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="gt-toolbar-group">
-          <span className="gt-label">Mode</span>
-          {MODES.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              className={`gt-btn ${mode === value ? "gt-btn--active" : ""}`}
-              onClick={() => setMode(value)}
-              disabled={isBusy}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {axis !== null && (
-          <>
-            <div className="gt-toolbar-group">
-              <span className="gt-label">{BAND_LABEL[axis]}</span>
-              {BAND_COUNTS.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`gt-btn ${bands === value ? "gt-btn--active" : ""}`}
-                  onClick={() => setBands(value)}
-                  disabled={isBusy}
-                >
-                  {value}
-                </button>
-              ))}
-            </div>
-
-            <div className="gt-toolbar-group">
-              <span className="gt-label">Scroll</span>
-              {DIRECTIONS.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`gt-btn ${direction === value ? "gt-btn--active" : ""}`}
-                  onClick={() => setDirection(value)}
-                  disabled={isBusy}
-                >
-                  {DIRECTION_LABELS[axis][value]}
-                </button>
-              ))}
-              <input
-                id="gt-speed"
-                type="number"
-                className="gt-number"
-                min={MIN_SCROLL_SPEED}
-                max={MAX_SCROLL_SPEED}
-                step={10}
-                value={speed}
+        <div className="gt-panel-body">
+          <Section index={1} title="Ratio">
+            <Field label="Aspect" stacked>
+              <Segmented
+                ariaLabel="Aspect ratio"
+                options={ASPECTS.map((value) => ({
+                  value,
+                  label: value,
+                  title: `${exportCanvasSize(value).width}×${exportCanvasSize(value).height}`,
+                }))}
+                value={aspect}
+                onChange={setAspect}
                 disabled={isBusy}
-                onChange={(event) => {
-                  const next = Number(event.target.value);
-                  if (Number.isFinite(next)) setSpeed(clampSpeed(next));
-                }}
               />
-              <label className="gt-label" htmlFor="gt-speed">
-                px/s
-              </label>
+            </Field>
+            <Field label="Background">
+              <Segmented
+                ariaLabel="Background"
+                options={BACKGROUND_OPTIONS}
+                value={background}
+                onChange={setBackground}
+                disabled={isBusy}
+              />
+            </Field>
+          </Section>
+
+          <Section index={2} title="Mode">
+            <Field stacked>
+              <Segmented
+                ariaLabel="Layout mode"
+                options={MODES}
+                value={mode}
+                onChange={setMode}
+                disabled={isBusy}
+              />
+            </Field>
+
+            {axis === null ? (
+              <div className="gt-subpanel">
+                <p className="gt-note">
+                  Drag a cell by its media to move it, or pull an edge to resize. The
+                  field is {GRID_COLS}×{GRID_ROWS}.
+                </p>
+                {cellControls}
+              </div>
+            ) : (
+              <div className="gt-subpanel">
+                <Field label={BAND_LABEL[axis]}>
+                  <Segmented
+                    ariaLabel={BAND_LABEL[axis]}
+                    options={BAND_COUNTS.map((value) => ({
+                      value,
+                      label: String(value),
+                    }))}
+                    value={bands}
+                    onChange={setBands}
+                    disabled={isBusy}
+                  />
+                </Field>
+
+                <Field label="Direction">
+                  <Segmented
+                    ariaLabel="Scroll direction"
+                    options={DIRECTIONS.map((value) => ({
+                      value,
+                      label: DIRECTION_LABELS[axis][value],
+                    }))}
+                    value={direction}
+                    onChange={setDirection}
+                    disabled={isBusy}
+                  />
+                </Field>
+
+                <Field label="Repeat">
+                  <Toggle
+                    on={repeat}
+                    onClick={() => setRepeat((value) => !value)}
+                    disabled={isBusy}
+                    title="Replicate the media until each band is longer than the frame, so the loop never runs dry"
+                  >
+                    {repeat ? "On" : "Off"}
+                  </Toggle>
+                </Field>
+
+                <Field label="Padding" stacked>
+                  <Slider
+                    id="gt-padding"
+                    value={spacing.padding}
+                    min={MIN_STRIP_SPACING}
+                    max={MAX_STRIP_SPACING}
+                    suffix="px"
+                    disabled={isBusy}
+                    onChange={(value) => setSpacingValue("padding", value)}
+                  />
+                </Field>
+
+                <Field label="Gap between cells" stacked>
+                  <Slider
+                    id="gt-cell-gap"
+                    value={spacing.cellGap}
+                    min={MIN_STRIP_SPACING}
+                    max={MAX_STRIP_SPACING}
+                    suffix="px"
+                    disabled={isBusy}
+                    onChange={(value) => setSpacingValue("cellGap", value)}
+                  />
+                </Field>
+
+                <Field
+                  label={BAND_GAP_LABEL[axis]}
+                  stacked
+                  hint={bands === 1 ? "Takes effect with two bands." : undefined}
+                >
+                  <Slider
+                    id="gt-band-gap"
+                    value={spacing.bandGap}
+                    min={MIN_STRIP_SPACING}
+                    max={MAX_STRIP_SPACING}
+                    suffix="px"
+                    disabled={isBusy || bands === 1}
+                    onChange={(value) => setSpacingValue("bandGap", value)}
+                  />
+                </Field>
+
+                {cellControls}
+              </div>
+            )}
+          </Section>
+
+          <Section index={3} title="Speed, duration & export">
+            {axis === null ? (
+              <p className="gt-note">Speed applies to the scrolling modes.</p>
+            ) : (
+              <Field label="Speed" stacked>
+                <Slider
+                  id="gt-speed"
+                  value={speed}
+                  min={MIN_SCROLL_SPEED}
+                  max={MAX_SCROLL_SPEED}
+                  step={10}
+                  suffix="px/s"
+                  disabled={isBusy}
+                  onChange={(value) => setSpeed(clampSpeed(value))}
+                />
+              </Field>
+            )}
+
+            <Field
+              label="Duration"
+              stacked
+              hint={
+                durationOverride === null
+                  ? "Following the footage."
+                  : undefined
+              }
+            >
+              <div className="gt-inline">
+                <input
+                  id="gt-duration"
+                  type="number"
+                  className="gt-number"
+                  min={MIN_DURATION}
+                  max={MAX_DURATION}
+                  step={1}
+                  value={duration}
+                  disabled={isBusy}
+                  onChange={(event) => {
+                    const next = Number(event.target.value);
+                    if (Number.isFinite(next)) setDurationOverride(clampDuration(next));
+                  }}
+                />
+                <span className="gt-unit">sec</span>
+                {durationOverride !== null && (
+                  <button
+                    type="button"
+                    className="gt-btn gt-btn--quiet"
+                    onClick={() => setDurationOverride(null)}
+                    disabled={isBusy}
+                    title="Go back to following the footage"
+                  >
+                    Auto
+                  </button>
+                )}
+              </div>
+            </Field>
+
+            <div className="gt-export">
               <button
                 type="button"
-                className={`gt-btn ${repeat ? "gt-btn--active" : ""}`}
-                onClick={() => setRepeat((value) => !value)}
-                disabled={isBusy}
-                title="Replicate the media until each band is longer than the frame, so the loop never runs dry"
+                className="gt-btn gt-btn--export"
+                onClick={handleExportClick}
+                disabled={!supportsExport || isBusy || exportCells.length === 0}
               >
-                Repeat
+                {exportLabel}
               </button>
+              {isBusy && (
+                <button type="button" className="gt-btn" onClick={cancel}>
+                  Cancel
+                </button>
+              )}
             </div>
-          </>
-        )}
 
-        <div className="gt-toolbar-group">
-          <span className="gt-label">
-            Cells {cells.length}/{MAX_CELLS}
-          </span>
-          <button
-            type="button"
-            className="gt-btn"
-            onClick={addCell}
-            disabled={cells.length >= MAX_CELLS}
-          >
-            + Add cell
-          </button>
-          {mode === "grid" && (
-            <button type="button" className="gt-btn" onClick={randomize} disabled={isBusy}>
-              Randomize
-            </button>
-          )}
-        </div>
+            {isBusy && (
+              <div className="gt-progress" role="progressbar" aria-valuenow={Math.round(progress * 100)}>
+                <div className="gt-progress-bar" style={{ width: `${progress * 100}%` }} />
+              </div>
+            )}
 
-        <div className="gt-toolbar-group">
-          <label className="gt-label" htmlFor="gt-duration">
-            Duration
-          </label>
-          <input
-            id="gt-duration"
-            type="number"
-            className="gt-number"
-            min={MIN_DURATION}
-            max={MAX_DURATION}
-            step={1}
-            value={duration}
-            disabled={isBusy}
-            onChange={(event) => {
-              const next = Number(event.target.value);
-              if (Number.isFinite(next)) setDurationOverride(clampDuration(next));
-            }}
-          />
-          <span className="gt-label">sec</span>
+            {!supportsExport && (
+              <p className="gt-note">Video export isn&apos;t supported in this browser.</p>
+            )}
+            {supportsExport && exportCells.length === 0 && (
+              <p className="gt-note">Add an image or video to a cell first.</p>
+            )}
+            {error && <p className="gt-note gt-note--error">{error}</p>}
+          </Section>
         </div>
+      </aside>
 
-        <div className="gt-toolbar-group">
-          <button
-            type="button"
-            className="gt-btn gt-btn--export"
-            onClick={handleExportClick}
-            disabled={!supportsExport || isBusy || exportCells.length === 0}
-          >
-            {exportLabel}
-          </button>
-          {isBusy && (
-            <button type="button" className="gt-btn" onClick={cancel}>
-              Cancel
-            </button>
-          )}
-          {!supportsExport && (
-            <span className="gt-hint">Video export isn&apos;t supported in this browser.</span>
-          )}
-          {supportsExport && exportCells.length === 0 && (
-            <span className="gt-hint">Add an image or video to a cell first.</span>
-          )}
-          {error && <span className="gt-hint gt-hint--error">{error}</span>}
-        </div>
-      </header>
+      <button
+        type="button"
+        className="gt-panel-tab"
+        onClick={() => setPanelOpen((open) => !open)}
+        aria-expanded={panelOpen}
+        aria-label={panelOpen ? "Hide controls" : "Show controls"}
+      >
+        {panelOpen ? "‹" : "Controls ›"}
+      </button>
 
       {/* The preview plays each cell on its own clock; the export always
           renders every cell from its start. Deliberate — the export is the
@@ -614,6 +725,7 @@ export default function GridTool() {
               axis={axis}
               bands={bands}
               repeat={repeat}
+              spacing={spacing}
               speed={speed}
               direction={direction}
               canRemove={cells.length > MIN_CELLS}
