@@ -58,7 +58,7 @@ import {
   useGridExport,
 } from "./useGridExport";
 
-const ASPECTS: Aspect[] = ["16:9", "9:16", "4:5", "5:4"];
+const ASPECTS: Aspect[] = ["9:16", "16:9", "4:5", "5:4"];
 
 /**
  * How the cells are arranged.
@@ -120,7 +120,7 @@ function clampSpeed(pixelsPerSecond: number) {
 }
 
 export default function GridTool() {
-  const [aspect, setAspect] = useState<Aspect>("16:9");
+  const [aspect, setAspect] = useState<Aspect>("9:16");
   const [background, setBackground] = useState<Background>(DEFAULT_BACKGROUND);
   const [mode, setMode] = useState<Mode>("grid");
   const [cells, setCells] = useState<MediaCell[]>(() => [newCell([])]);

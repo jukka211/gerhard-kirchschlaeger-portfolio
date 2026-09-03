@@ -75,7 +75,7 @@ export const BACKGROUNDS: Record<Background, string> = {
   white: "#ffffff",
 };
 
-export const DEFAULT_BACKGROUND: Background = "black";
+export const DEFAULT_BACKGROUND: Background = "white";
 
 /** A cell's placement on the export canvas, in pixels. */
 export interface PixelRect {
