@@ -45,7 +45,9 @@ import {
 } from "./stripGeometry";
 import {
   type Background,
+  type ObjectFit,
   DEFAULT_BACKGROUND,
+  DEFAULT_FIT,
   exportCanvasSize,
   previewMargin,
 } from "./exportGeometry";
@@ -106,6 +108,20 @@ const BACKGROUND_OPTIONS: Choice<Background>[] = [
   { value: "white", label: "White" },
 ];
 
+/**
+ * Grid mode only: a cell there is a box the user drew, so its media has to
+ * give something up to fit it. The scrolling modes cut their items to the
+ * media's own shape instead, which leaves nothing to choose.
+ */
+const FIT_OPTIONS: Choice<ObjectFit>[] = [
+  { value: "cover", label: "Fill", title: "Crop the media to fill the cell" },
+  {
+    value: "contain",
+    label: "Fit",
+    title: "Fit the whole media inside the cell, keeping its own proportions",
+  },
+];
+
 const MIN_DURATION = 1;
 const MAX_DURATION = 60;
 /** Used when nothing in the grid has a length of its own to borrow. */
@@ -123,6 +139,8 @@ export default function GridTool() {
   const [aspect, setAspect] = useState<Aspect>("9:16");
   const [background, setBackground] = useState<Background>(DEFAULT_BACKGROUND);
   const [mode, setMode] = useState<Mode>("grid");
+  /** How grid cells treat media that isn't their shape. */
+  const [fit, setFit] = useState<ObjectFit>(DEFAULT_FIT);
   const [cells, setCells] = useState<MediaCell[]>(() => [newCell([])]);
   /** null until the user types a length of their own, so the field keeps
    * tracking the footage until they take it over. */
@@ -357,7 +375,7 @@ export default function GridTool() {
   const layout = useMemo<ExportLayout>(
     () =>
       axis === null
-        ? { mode: "grid", cells: exportCells }
+        ? { mode: "grid", cells: exportCells, fit }
         : {
             mode: "strip",
             axis,
@@ -369,7 +387,7 @@ export default function GridTool() {
             // know to run the strip the other way.
             speed: direction === "backward" ? -speed : speed,
           },
-    [axis, bands, direction, exportCells, repeat, spacing, speed, stripItems]
+    [axis, bands, direction, exportCells, fit, repeat, spacing, speed, stripItems]
   );
 
   /**
@@ -497,6 +515,24 @@ export default function GridTool() {
                   Drag a cell by its media to move it, or pull an edge to resize. The
                   field is {GRID_COLS}×{GRID_ROWS}.
                 </p>
+
+                <Field
+                  label="Media"
+                  hint={
+                    fit === "contain"
+                      ? "The background shows around media that isn\u2019t the cell\u2019s shape."
+                      : undefined
+                  }
+                >
+                  <Segmented
+                    ariaLabel="How media fills a cell"
+                    options={FIT_OPTIONS}
+                    value={fit}
+                    onChange={setFit}
+                    disabled={isBusy}
+                  />
+                </Field>
+
                 {cellControls}
               </div>
             ) : (
@@ -711,6 +747,7 @@ export default function GridTool() {
                   <GridCellContent
                     cell={cell}
                     canRemove={cells.length > MIN_CELLS}
+                    fit={fit}
                     onRemove={removeCell}
                     onMediaFile={handleMediaFile}
                     onMediaClear={handleMediaClear}

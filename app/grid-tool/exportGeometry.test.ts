@@ -5,9 +5,11 @@ import {
   DEFAULT_BACKGROUND,
   EXPORT_GAP,
   EXPORT_SCALE,
+  type PixelRect,
   cellPixelRect,
   coverCrop,
   exportCanvasSize,
+  fitRects,
   previewMargin,
 } from "./exportGeometry";
 import {
@@ -207,6 +209,88 @@ describe("coverCrop", () => {
     expect(coverCrop(100, 0, 100, 100)).toBeNull();
     expect(coverCrop(100, 100, 0, 100)).toBeNull();
     expect(coverCrop(100, 100, 100, 0)).toBeNull();
+  });
+});
+
+describe("fitRects", () => {
+  const cell: PixelRect = { x: 100, y: 200, width: 400, height: 400 };
+
+  it("keeps the whole cell and crops the source under cover", () => {
+    const fitted = fitRects(1000, 500, cell, "cover")!;
+
+    expect(fitted.dest).toEqual(cell);
+    expect(fitted.crop).toEqual(coverCrop(1000, 500, cell.width, cell.height));
+  });
+
+  it("keeps the whole source and letterboxes the cell under contain", () => {
+    // 2:1 into a square cell: full width, half the height, centred.
+    const fitted = fitRects(1000, 500, cell, "contain")!;
+
+    expect(fitted.crop).toEqual({ sx: 0, sy: 0, sWidth: 1000, sHeight: 500 });
+    expect(fitted.dest).toEqual({ x: 100, y: 300, width: 400, height: 200 });
+  });
+
+  it("pillarboxes a source taller than its cell", () => {
+    // 1:2 into a square cell: full height, half the width, centred.
+    const fitted = fitRects(500, 1000, cell, "contain")!;
+
+    expect(fitted.dest).toEqual({ x: 200, y: 200, width: 200, height: 400 });
+  });
+
+  it("fits inside the cell without distorting the source", () => {
+    const cases = [
+      [1920, 1080, 400, 900],
+      [640, 480, 1000, 200],
+      [1080, 1920, 500, 500],
+      [3000, 200, 800, 600],
+      [200, 3000, 600, 800],
+    ] as const;
+
+    for (const [sw, sh, width, height] of cases) {
+      const rect: PixelRect = { x: 40, y: 60, width, height };
+      const { dest } = fitRects(sw, sh, rect, "contain")!;
+      const where = `${sw}x${sh} in ${width}x${height}`;
+
+      // Inside the cell on both axes...
+      expect(dest.x, where).toBeGreaterThanOrEqual(rect.x);
+      expect(dest.y, where).toBeGreaterThanOrEqual(rect.y);
+      expect(dest.x + dest.width, where).toBeLessThanOrEqual(rect.x + rect.width);
+      expect(dest.y + dest.height, where).toBeLessThanOrEqual(rect.y + rect.height);
+      // ...touching the edge on the axis it fills...
+      const filled = Math.max(dest.width / width, dest.height / height);
+      expect(filled, where).toBeGreaterThan(0.99);
+      // ...and within the even-edge snap of the exact fit, so it neither
+      // stretches the source nor leaves a margin it didn't need.
+      const scale = Math.min(width / sw, height / sh);
+      expect(Math.abs(dest.width - sw * scale), where).toBeLessThanOrEqual(2);
+      expect(Math.abs(dest.height - sh * scale), where).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it("snaps the letterboxed box to even edges", () => {
+    // 3:2 into a 401x301 cell: the exact fit is fractional on both axes.
+    const { dest } = fitRects(300, 200, { x: 11, y: 13, width: 401, height: 301 }, "contain")!;
+
+    expect(dest.x % 2, "x").toBe(1); // 11 + an even offset
+    expect(dest.y % 2, "y").toBe(1);
+    expect(dest.width % 2, "width").toBe(0);
+    expect(dest.height % 2, "height").toBe(0);
+  });
+
+  it("never hands back a zero-sized box for an extreme ratio", () => {
+    const { dest } = fitRects(4000, 1, { x: 0, y: 0, width: 100, height: 100 }, "contain")!;
+
+    expect(dest.width).toBeGreaterThan(0);
+    expect(dest.height).toBeGreaterThan(0);
+  });
+
+  it("returns null when there is nothing to draw", () => {
+    const cell0: PixelRect = { x: 0, y: 0, width: 0, height: 100 };
+
+    expect(fitRects(100, 100, cell0, "contain")).toBeNull();
+    expect(fitRects(100, 100, cell0, "cover")).toBeNull();
+    expect(fitRects(0, 100, cell, "contain")).toBeNull();
+    expect(fitRects(100, 0, cell, "cover")).toBeNull();
   });
 });
 

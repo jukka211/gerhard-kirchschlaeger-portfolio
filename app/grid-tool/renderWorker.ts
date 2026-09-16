@@ -14,7 +14,12 @@ import {
   type VideoCodec,
   type VideoSample,
 } from "mediabunny";
-import { EXPORT_SCALE, coverCrop, type PixelRect } from "./exportGeometry";
+import {
+  EXPORT_SCALE,
+  fitRects,
+  type ObjectFit,
+  type PixelRect,
+} from "./exportGeometry";
 
 /**
  * Renders the grid offline, one frame at a time, and muxes the result to MP4.
@@ -73,6 +78,8 @@ export interface RenderCell {
    * the frame's scroll offset is added.
    */
   rects: PixelRect[];
+  /** How the source fills its rects. Defaults to cropping to fill them. */
+  fit?: ObjectFit;
   /** Index into RenderRequest.strips, for a cell that scrolls. */
   strip?: number;
 }
@@ -164,26 +171,30 @@ interface CellRenderer {
   close(): Promise<void>;
 }
 
-/** Draws a source into its cell, cropped like CSS `object-fit: cover`. */
+/** Draws a source into its cell, laid out like the CSS `object-fit` of the
+ * same name. */
 function drawSample(
   ctx: OffscreenCanvasRenderingContext2D,
   sample: VideoSample,
-  rect: PixelRect
+  rect: PixelRect,
+  fit: ObjectFit
 ) {
   // displayWidth/Height are corrected for rotation and pixel aspect ratio, so
-  // a clip shot in portrait crops the way it looks, not the way it's stored.
-  const crop = coverCrop(sample.displayWidth, sample.displayHeight, rect.width, rect.height);
-  if (!crop) return;
+  // a clip shot in portrait is fitted the way it looks, not the way it's
+  // stored.
+  const fitted = fitRects(sample.displayWidth, sample.displayHeight, rect, fit);
+  if (!fitted) return;
+  const { crop, dest } = fitted;
   sample.draw(
     ctx,
     crop.sx,
     crop.sy,
     crop.sWidth,
     crop.sHeight,
-    rect.x,
-    rect.y,
-    rect.width,
-    rect.height
+    dest.x,
+    dest.y,
+    dest.width,
+    dest.height
   );
 }
 
@@ -240,6 +251,7 @@ async function openVideoCell(
   frameTimestamps: number[]
 ): Promise<CellRenderer> {
   const input = new Input({ formats: ALL_FORMATS, source: new BlobSource(cell.file) });
+  const fit = cell.fit ?? "cover";
 
   let samples: AsyncGenerator<VideoSample | null, void, unknown>;
   try {
@@ -265,7 +277,7 @@ async function openVideoCell(
     draw(ctx, rect) {
       // null means the clip has nothing at this time — a source that starts
       // after zero. The background shows through, as it would in the preview.
-      if (current) drawSample(ctx, current, rect);
+      if (current) drawSample(ctx, current, rect, fit);
     },
     release() {
       // Never hold more than the frame being drawn: a handful of unclosed
@@ -293,20 +305,29 @@ async function openVideoCell(
  */
 async function openImageCell(cell: RenderCell): Promise<CellRenderer> {
   // Every rect a cell has is the same size — repeats of a column item differ
-  // only in where they sit — so one pre-scaled bitmap serves all of them.
+  // only in where they sit — so one pre-scaled bitmap serves all of them, and
+  // so does one offset into them.
   const rect = cell.rects[0];
   let bitmap: ImageBitmap;
+  // Where the bitmap sits inside its rect. Zero under `cover`, which fills the
+  // rect exactly; under `contain` it's the letterbox on each side.
+  let offsetX = 0;
+  let offsetY = 0;
 
   try {
     // from-image applies EXIF orientation, matching what an <img> shows in
     // the preview.
     const decoded = await createImageBitmap(cell.file, { imageOrientation: "from-image" });
-    const crop = coverCrop(decoded.width, decoded.height, rect.width, rect.height);
+    const fitted = fitRects(decoded.width, decoded.height, rect, cell.fit ?? "cover");
 
-    if (!crop) {
+    if (!fitted) {
       decoded.close();
       throw new Error(`"${cell.file.name}" has no drawable image data.`);
     }
+
+    const { crop, dest } = fitted;
+    offsetX = dest.x - rect.x;
+    offsetY = dest.y - rect.y;
 
     try {
       bitmap = await createImageBitmap(
@@ -315,7 +336,7 @@ async function openImageCell(cell: RenderCell): Promise<CellRenderer> {
         Math.round(crop.sy),
         Math.round(crop.sWidth),
         Math.round(crop.sHeight),
-        { resizeWidth: rect.width, resizeHeight: rect.height, resizeQuality: "high" }
+        { resizeWidth: dest.width, resizeHeight: dest.height, resizeQuality: "high" }
       );
     } finally {
       decoded.close();
@@ -329,8 +350,8 @@ async function openImageCell(cell: RenderCell): Promise<CellRenderer> {
   return {
     async prepare() {},
     draw(ctx, at) {
-      // Already cropped and sized to the cell, so this is a straight blit.
-      ctx.drawImage(bitmap, at.x, at.y);
+      // Already cropped and sized to where it goes, so this is a straight blit.
+      ctx.drawImage(bitmap, at.x + offsetX, at.y + offsetY);
     },
     release() {},
     async close() {

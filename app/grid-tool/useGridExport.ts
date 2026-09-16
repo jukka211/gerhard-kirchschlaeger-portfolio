@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type Background,
+  type ObjectFit,
   BACKGROUNDS,
   EXPORT_FPS,
   EXPORT_SCALE,
@@ -61,7 +62,17 @@ export interface ExportStripItem {
  * the flat list of pixel rects the worker draws.
  */
 export type ExportLayout =
-  | { mode: "grid"; cells: ExportCell[] }
+  | {
+      mode: "grid";
+      cells: ExportCell[];
+      /**
+       * How every cell's media fills its box. One setting for the whole grid:
+       * mixing crops and letterboxes cell by cell reads as a mistake rather
+       * than a choice, and the strip modes size their items from the media's
+       * own shape already, so there's nothing there for it to decide.
+       */
+      fit: ObjectFit;
+    }
   | {
       mode: "strip";
       /** Columns run vertical, rows run horizontal; the rest is identical. */
@@ -101,6 +112,7 @@ function buildCells(
         kind: cell.kind,
         file: cell.file,
         rects: [cellPixelRect(cell.rect, aspect)],
+        fit: layout.fit,
       })),
       strips: [],
     };

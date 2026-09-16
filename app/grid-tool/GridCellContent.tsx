@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import type { Cell, MediaType } from "./gridLayout";
+import { type ObjectFit, DEFAULT_FIT } from "./exportGeometry";
 
 interface GridCellContentProps {
   cell: Cell;
@@ -12,6 +13,9 @@ interface GridCellContentProps {
    * offer to replace or remove it, and the clones are inert scenery.
    */
   interactive?: boolean;
+  /** How the media fills the cell. The value goes straight to `object-fit`,
+   * and the renderer lays the export out to match (see fitRects). */
+  fit?: ObjectFit;
   onRemove: (id: string) => void;
   onMediaFile: (id: string, type: MediaType, file: File) => void;
   onMediaClear: (id: string) => void;
@@ -31,6 +35,7 @@ export default function GridCellContent({
   cell,
   canRemove,
   interactive = true,
+  fit = DEFAULT_FIT,
   onRemove,
   onMediaFile,
   onMediaClear,
@@ -49,7 +54,11 @@ export default function GridCellContent({
   };
 
   return (
-    <div className={`gt-cell ${interactive ? "" : "gt-cell--clone"}`}>
+    <div
+      className={`gt-cell ${interactive ? "" : "gt-cell--clone"} ${
+        cell.media ? "gt-cell--filled" : ""
+      }`}
+    >
       {interactive && (
         <div className="gt-cell-toolbar">
           <button
@@ -64,7 +73,7 @@ export default function GridCellContent({
         </div>
       )}
 
-      <div className="gt-cell-media">
+      <div className={`gt-cell-media gt-cell-media--${fit}`}>
         {cell.media?.type === "image" && (
           <img src={cell.media.url} alt={cell.media.name} draggable={false} />
         )}

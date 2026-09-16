@@ -110,6 +110,12 @@ export function evenRound(value: number) {
   return 2 * Math.round(value / 2);
 }
 
+/** The largest even number at or below `value` — the same snap as evenRound
+ * where rounding up would push an edge past something it has to stay inside. */
+function evenFloor(value: number) {
+  return 2 * Math.floor(value / 2);
+}
+
 /**
  * Converts a cell's grid units into its pixel rect on the export canvas.
  *
@@ -168,6 +174,84 @@ export function coverCrop(
   // and bottom.
   const sHeight = sourceWidth / destRatio;
   return { sx: 0, sy: (sourceHeight - sHeight) / 2, sWidth: sourceWidth, sHeight };
+}
+
+/**
+ * How a source fills the cell it's given.
+ *
+ * `cover` crops it to fill the cell edge to edge, which is what the tool has
+ * always done; `contain` fits the whole frame inside instead, keeping its own
+ * proportions and letting the background show on the axis it falls short of.
+ * The names are CSS's, and so is the geometry (see fitRects), so the preview
+ * can simply hand the value to `object-fit`.
+ */
+export type ObjectFit = "cover" | "contain";
+
+export const DEFAULT_FIT: ObjectFit = "cover";
+
+/**
+ * Where a source lands in its cell, and which part of it is used, under `fit`.
+ *
+ * The two fits are the same question answered at opposite ends: `cover` keeps
+ * the destination and trims the source, `contain` keeps the source whole and
+ * shrinks the destination. Both come out of here as a source rect and a
+ * destination rect, so the renderer draws the same way whichever is in force.
+ *
+ * The contained box is snapped to even edges for the reason cell edges are
+ * (see evenRound): letterboxing puts a source edge in the middle of a cell,
+ * where an odd coordinate would split a chroma sample between the media and
+ * the ground behind it. It's also clamped to the cell, so a rounded-up edge
+ * can never bleed into the gap.
+ *
+ * Returns null when there's nothing sensible to draw.
+ */
+export function fitRects(
+  sourceWidth: number,
+  sourceHeight: number,
+  rect: PixelRect,
+  fit: ObjectFit
+): { crop: CropRect; dest: PixelRect } | null {
+  if (fit === "cover") {
+    const crop = coverCrop(sourceWidth, sourceHeight, rect.width, rect.height);
+    return crop && { crop, dest: rect };
+  }
+
+  if (sourceWidth <= 0 || sourceHeight <= 0 || rect.width <= 0 || rect.height <= 0) {
+    return null;
+  }
+
+  const scale = Math.min(rect.width / sourceWidth, rect.height / sourceHeight);
+  const width = fitEven(rect.width, sourceWidth * scale);
+  const height = fitEven(rect.height, sourceHeight * scale);
+  // Only when the cell itself is too small to hold an even pixel either way.
+  if (width <= 0 || height <= 0) return null;
+
+  return {
+    crop: { sx: 0, sy: 0, sWidth: sourceWidth, sHeight: sourceHeight },
+    dest: {
+      // Centring floors rather than rounds for the same reason the size caps:
+      // a rounded-up offset on a cell of odd width would walk the far edge out
+      // into the gap. The cost is being half a pixel off centre.
+      x: rect.x + evenFloor((rect.width - width) / 2),
+      y: rect.y + evenFloor((rect.height - height) / 2),
+      width,
+      height,
+    },
+  };
+}
+
+/**
+ * An even extent as near `exact` as possible without exceeding `available`.
+ *
+ * The cap is itself snapped down to even, so the result stays even in a cell
+ * whose own size is odd — 5:4 has those (see cellPixelRect's callers). The
+ * floor of 2 keeps an extreme ratio — a panorama in a sliver of a cell — from
+ * rounding its short axis away to nothing, which would leave the encoder or
+ * createImageBitmap with a zero-sized box to fill; it yields 0 only when the
+ * cell has no room for even that, which the caller reads as nothing to draw.
+ */
+function fitEven(available: number, exact: number) {
+  return Math.min(evenFloor(available), Math.max(2, evenRound(exact)));
 }
 
 /**

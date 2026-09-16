@@ -517,6 +517,13 @@
   flex-direction: column;
 }
 
+/* Once a cell holds media it isn't a slot to fill any more, so it drops the
+ * tint for the ground itself. That only shows under `contain`, where it's
+ * exactly what the export paints around the media. */
+.gt-cell--filled {
+  background: var(--gt-bg);
+}
+
 .gt-cell-toolbar {
   position: absolute;
   top: 6px;
@@ -571,6 +578,13 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* Letterboxed media shows the cell behind it, so the cell has to be the
+ * ground the export paints — see .gt-cell--filled. */
+.gt-cell-media--contain img,
+.gt-cell-media--contain video {
+  object-fit: contain;
 }
 
 .gt-cell-empty {
