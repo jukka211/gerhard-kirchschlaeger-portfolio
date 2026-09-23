@@ -25,85 +25,163 @@
 
         <label class="control block-control" for="textArea">
           <span>Text</span>
-          <textarea id="textArea" spellcheck="false" rows="4">Write something...</textarea>
+          <textarea id="textArea" spellcheck="false" rows="3">AB123
+xyZ...</textarea>
         </label>
 
-        <div class="control-grid">
+        <!-- Layout -->
+        <div class="control-group" role="group" aria-labelledby="group-layout">
+          <span class="control-group-title" id="group-layout">Layout</span>
+          <div class="control-grid">
+            <label class="slider-control">
+              <span>Alignment</span>
+              <select id="alignSelect" class="select-control">
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </label>
 
-          <!-- Layout -->
-          <label class="slider-control">
-            <span>Ausrichtung</span>
-            <select id="alignSelect" class="select-control">
-              <option value="left">Links</option>
-              <option value="center">Zentriert</option>
-              <option value="right">Rechts</option>
-            </select>
-          </label>
+            <label class="slider-control">
+              <span>Text Size</span>
+              <input id="textSize" type="range" min="20" max="300" value="100" step="1" />
+              <span class="value" id="textSize-value" data-suffix="%"></span>
+            </label>
 
-          <label class="slider-control">
-            <span>Zeilenabstand</span>
-            <input id="leading" type="range" min="120" max="260" value="190" step="1" />
-            <span class="value" id="leading-value"></span>
-          </label>
+            <label class="slider-control">
+              <span>Line Spacing</span>
+              <input id="leading" type="range" min="120" max="260" value="138" step="1" />
+              <span class="value" id="leading-value"></span>
+            </label>
+          </div>
+        </div>
 
-          <!-- Glyphen -->
-          <label class="slider-control">
-            <span>Krümmung</span>
-            <input id="curve" type="range" min="-1" max="1" value="-0.4" step="0.01" />
-            <span class="value" id="curve-value"></span>
-          </label>
+        <!-- Form -->
+        <div class="control-group" role="group" aria-labelledby="group-form">
+          <span class="control-group-title" id="group-form">Form</span>
+          <div class="control-grid">
+            <label class="slider-control">
+              <span>Loops</span>
+              <input id="loops" type="range" min="0" max="2.5" value="0.33" step="0.01" />
+              <span class="value" id="loops-value"></span>
+            </label>
 
-          <label class="slider-control">
-            <span>Schleifen</span>
-            <input id="loops" type="range" min="0" max="1" value="0.6" step="0.01" />
-            <span class="value" id="loops-value"></span>
-          </label>
+            <label class="slider-control">
+              <span>Curvature</span>
+              <input id="curve" type="range" min="-1" max="1" value="-0.85" step="0.01" />
+              <span class="value" id="curve-value"></span>
+            </label>
 
-          <label class="slider-control">
-            <span>Radius</span>
-            <input id="radius" type="range" min="0.2" max="2.0" value="1" step="0.01" />
-            <span class="value" id="radius-value"></span>
-          </label>
+            <label class="slider-control">
+              <span>Radius</span>
+              <input id="radius" type="range" min="0.05" max="4" value="1.90" step="0.01" />
+              <span class="value" id="radius-value"></span>
+            </label>
 
-          <label class="slider-control">
-            <span>Strichstärke</span>
-            <input id="weight" type="range" min="4" max="40" value="16" step="1" />
-            <span class="value" id="weight-value"></span>
-          </label>
+            <label class="slider-control">
+              <span>Weight</span>
+              <input id="weight" type="range" min="4" max="72" value="20" step="1" />
+              <span class="value" id="weight-value"></span>
+            </label>
 
-          <label class="slider-control">
-            <span>Abstand</span>
-            <input id="spacing" type="range" min="30" max="160" value="90" step="1" />
-            <span class="value" id="spacing-value"></span>
-          </label>
+            <label class="slider-control">
+              <span>Spacing</span>
+              <input id="spacing" type="range" min="30" max="160" value="132" step="1" />
+              <span class="value" id="spacing-value"></span>
+            </label>
 
+            <label class="slider-control">
+              <span>Mutation</span>
+              <input id="mutation" type="range" min="0" max="2" value="0.46" step="0.01" />
+              <span class="value" id="mutation-value"></span>
+            </label>
+
+            <label class="slider-control">
+              <span>Mutation Seed</span>
+              <input id="mutationSeed" type="range" min="1" max="999" value="560" step="1" />
+              <span class="value" id="mutationSeed-value"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Inner Line -->
+        <div class="control-group" role="group" aria-labelledby="group-inner">
+          <span class="control-group-title" id="group-inner">Inner Line</span>
+          <div class="control-grid">
+            <label class="slider-control">
+              <span>Inner Line A</span>
+              <input id="innerScaleA" type="range" min="0" max="1" value="1" step="0.01" />
+              <span class="value" id="innerScaleA-value"></span>
+            </label>
+
+            <label class="slider-control">
+              <span>Inner Line B</span>
+              <input id="innerScaleB" type="range" min="0" max="1" value="0.28" step="0.01" />
+              <span class="value" id="innerScaleB-value"></span>
+            </label>
+
+            <label class="slider-control wide">
+              <span>Inner Pattern</span>
+              <select id="innerPattern" class="select-control">
+                <option value="fixed">FIXED – A ONLY</option>
+                <option value="alternate">ALTERNATING – A / B</option>
+                <option value="random">RANDOM – BETWEEN A AND B</option>
+                <option value="cycle4">RHYTHM 4 – A &gt; MIX &gt; MIX &gt; B</option>
+                <option value="wave">WAVE – A &gt; MID &gt; B &gt; MID</option>
+                <option value="extreme">EXTREME – 5-STEP RHYTHM</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <!-- Outer Weight Mix -->
+        <div class="control-group" role="group" aria-labelledby="group-weight">
+          <span class="control-group-title" id="group-weight">Outer Weight Mix</span>
+          <div class="control-grid">
+            <label class="slider-control">
+              <span>Weight A</span>
+              <input id="weightScaleA" type="range" min="0.2" max="2.5" value="1" step="0.01" />
+              <span class="value" id="weightScaleA-value"></span>
+            </label>
+
+            <label class="slider-control">
+              <span>Weight B</span>
+              <input id="weightScaleB" type="range" min="0.2" max="2.5" value="0.85" step="0.01" />
+              <span class="value" id="weightScaleB-value"></span>
+            </label>
+
+            <label class="slider-control wide">
+              <span>Weight Pattern</span>
+              <select id="weightPattern" class="select-control">
+                <option value="fixed">FIXED – A ONLY</option>
+                <option value="alternate">ALTERNATING – A / B</option>
+                <option value="random">RANDOM – BETWEEN A AND B</option>
+                <option value="cycle4">RHYTHM 4 – A &gt; MIX &gt; MIX &gt; B</option>
+                <option value="wave">WAVE – A &gt; MID &gt; B &gt; MID</option>
+                <option value="extreme">EXTREME – 5-STEP RHYTHM</option>
+                <option value="custom">CUSTOM – OWN SEQUENCE</option>
+              </select>
+            </label>
+
+            <label class="slider-control wide">
+              <span>Weight Sequence</span>
+              <input id="weightSequenceInput" class="text-control" type="text" value="1.00, 0.85, 0.72, 0.90" spellcheck="false" />
+            </label>
+
+            <label class="slider-control">
+              <span>Weight Offset</span>
+              <input id="weightOffset" type="range" min="0" max="24" value="0" step="1" />
+              <span class="value" id="weightOffset-value"></span>
+            </label>
+          </div>
         </div>
 
         <div class="actions">
           <div class="toggles-row">
             <label class="toggle-control">
               <input id="fillMode" type="checkbox" />
-              <span>Gefüllt</span>
+              <span>Solid (black)</span>
             </label>
-
-            <label class="toggle-control">
-              <input id="randomAlt" type="checkbox" />
-              <span>Random Alts</span>
-            </label>
-
-            <label class="toggle-control">
-              <input id="liga" type="checkbox" checked />
-              <span>Ligaturen</span>
-            </label>
-          </div>
-
-          <div class="opentype-row">
-            <select id="ssSelect" class="select-control">
-              <option value="default">Standard</option>
-              <option value="ss01">ss01 – Wild</option>
-              <option value="ss02">ss02 – Minimal</option>
-              <option value="ss03">ss03 – Overcross</option>
-            </select>
           </div>
 
           <div class="export-btns">
@@ -134,7 +212,7 @@
         if (valueEl) {
           const update = () => valueEl.textContent = parseFloat(input.value).toFixed(
             input.step && input.step.includes('.') ? input.step.split('.')[1].length : 0
-          );
+          ) + (valueEl.dataset.suffix || '');
           update();
           input.addEventListener('input', update);
         }
