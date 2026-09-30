@@ -25,6 +25,8 @@ type Slider = {
   label: string;
   min: number;
   max: number;
+  // A lower cap on phones, if the full range is too much for them.
+  phoneMax?: number;
   step: number;
   // Where the thumb sits while the property is still on auto.
   rest: number;
@@ -38,6 +40,7 @@ const SLIDERS: Slider[] = [
     label: "size",
     min: 6,
     max: 800,
+    phoneMax: 330,
     step: 1,
     rest: 14,
     format: (value) => `${value} px`,
@@ -129,6 +132,34 @@ function siteFontId() {
   return (SITE_FONTS.find((font) => font.family === family) ?? SITE_FONTS[0]).id;
 }
 
+// Whether the phone layout in type-tester.css applies.
+const PHONE_QUERY = "(max-width: 768px)";
+
+function subscribeToPhone(onChange: () => void) {
+  const query = window.matchMedia(PHONE_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+function useIsPhone() {
+  return useSyncExternalStore(
+    subscribeToPhone,
+    () => window.matchMedia(PHONE_QUERY).matches,
+    () => false
+  );
+}
+
+function sliderMax(slider: Slider, phone: boolean) {
+  return phone ? (slider.phoneMax ?? slider.max) : slider.max;
+}
+
+// A slider's value as applied: null while on auto, and on phones no more
+// than its phone cap, even if it was set higher on a wider screen.
+function sliderValue(settings: Settings, slider: Slider, phone: boolean) {
+  const value = settings[slider.key];
+  return value === null ? null : Math.min(value, sliderMax(slider, phone));
+}
+
 function isCurrent(pathname: string | null, route: string) {
   if (route === "/") return pathname === "/";
   return pathname === route || pathname?.startsWith(`${route}/`);
@@ -143,6 +174,7 @@ export default function TypeTester() {
   const [open, setOpen] = useState(false);
   const [settings, setSettings] = useState<Settings>(AUTO);
   const siteFont = useSiteFontId();
+  const phone = useIsPhone();
 
   // Settings live on <html> so they survive navigating between the about
   // and legal pages; type-tester.css maps each data-tt-* flag onto the
@@ -161,11 +193,11 @@ export default function TypeTester() {
         vars.font = `"${family}", monospace`;
       }
     }
-    for (const { key, toCss } of SLIDERS) {
-      const value = settings[key];
+    for (const slider of SLIDERS) {
+      const value = sliderValue(settings, slider, phone);
       if (value === null) continue;
-      flags[key] = "";
-      vars[key] = toCss(value);
+      flags[slider.key] = "";
+      vars[slider.key] = slider.toCss(value);
     }
     flags.align = "";
     vars.align = settings.align;
@@ -177,7 +209,7 @@ export default function TypeTester() {
       for (const key of Object.keys(flags)) root.removeAttribute(`data-tt-${key}`);
       for (const key of Object.keys(vars)) root.style.removeProperty(`--tt-${key}`);
     };
-  }, [settings]);
+  }, [settings, phone]);
 
   useEffect(() => {
     if (!open) return;
@@ -272,7 +304,7 @@ export default function TypeTester() {
                   </div>
 
                   {SLIDERS.map((slider) => {
-                    const value = settings[slider.key];
+                    const value = sliderValue(settings, slider, phone);
                     const inputId = `${id}-${slider.key}`;
 
                     return (
@@ -295,7 +327,7 @@ export default function TypeTester() {
                         <RangeInput
                           id={inputId}
                           min={slider.min}
-                          max={slider.max}
+                          max={sliderMax(slider, phone)}
                           step={slider.step}
                           value={value ?? slider.rest}
                           onValueChange={(next) => update(slider.key, next)}

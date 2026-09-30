@@ -84,10 +84,6 @@ p {
   overflow: hidden;
 }
 
-.home-slideshow--single {
-  cursor: none;
-}
-
 .home-slideshow--mobile {
   display: none;
 }
@@ -141,19 +137,6 @@ p {
 .home-slideshow--single .home-slideshow-grid img {
   inset: 2rem 0;
   height: calc(100% - 4rem);
-}
-
-.home-slideshow-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  pointer-events: none;
-  color: rgb(255, 255, 255);
-  mix-blend-mode: difference;
-  font-size: 0.9rem;
-  text-transform: lowercase;
-  white-space: nowrap;
 }
 
 /* Portfolio slider */
