@@ -12,19 +12,25 @@ export default async function HomePage() {
     query: homePageQuery,
   })) as { data: HomePageData | null };
 
-  // The desktop slides everywhere: they're the images in their original
-  // landscape format, where the mobile ones are portrait crops of them.
-  const slides = (data?.desktopSlides ?? [])
-    .filter((slide) => slide.asset?.url)
-    .map((slide) => ({
-      key: slide._key,
-      url: `${slide.asset!.url!}?w=2400&q=75&auto=format`,
-      alt: slide.alt || "",
-    }));
+  const toSlides = (slides: HomePageData["desktopSlides"]) =>
+    (slides ?? [])
+      .filter((slide) => slide.asset?.url)
+      .map((slide) => ({
+        key: slide._key,
+        url: `${slide.asset!.url!}?w=2400&q=75&auto=format`,
+        alt: slide.alt || "",
+      }));
+
+  const desktopSlides = toSlides(data?.desktopSlides);
+  const mobileSlides = toSlides(data?.mobileSlides);
 
   return (
     <main className="home-page">
-      <HomeSlideshow slides={slides} />
+      <HomeSlideshow slides={desktopSlides} variant="desktop" />
+      <HomeSlideshow
+        slides={mobileSlides.length > 0 ? mobileSlides : desktopSlides}
+        variant="mobile"
+      />
     </main>
   );
 }
