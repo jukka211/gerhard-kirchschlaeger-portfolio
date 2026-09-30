@@ -1,13 +1,13 @@
 // The site's typefaces, declared in globals.css. Each visit opens in one of
 // them at random; the type tester can pick one instead, or mix them.
 export const SITE_FONTS = [
-  { id: "gain-black", label: "gain black", family: "Gain Black" },
+  { id: "gain-black", label: "Gain Black", family: "Gain Black" },
   {
     id: "massimo-grafia-plain-mono",
-    label: "massimo grafia plain mono",
+    label: "Massimo Grafia Plain",
     family: "Massimo Grafia Plain Mono",
   },
-  { id: "takeoff-b4100-bold", label: "takeoff b4100 bold", family: "Takeoff B4100 Bold" },
+  { id: "takeoff-b4100-bold", label: "TakeOff", family: "Takeoff B4100 Bold" },
 ] as const;
 
 // Runs before the page paints, so the text never shows up in one font and

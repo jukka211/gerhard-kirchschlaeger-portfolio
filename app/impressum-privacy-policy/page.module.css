@@ -168,6 +168,11 @@
 }
 
 @media (max-width: 768px) {
+  /* Room to scroll the last rows up clear of the settings bar. */
+  .page {
+    padding-bottom: 10vh;
+  }
+
   .text:global(.mode-columns) {
     column-count: 1;
     height: auto;

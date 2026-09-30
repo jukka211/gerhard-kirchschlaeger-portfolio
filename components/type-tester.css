@@ -114,7 +114,6 @@
 .type-tester-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
   /* Scrolls on its own when taller than what the navigation leaves of the screen. */
   min-height: 0;
   overflow-y: auto;
@@ -128,10 +127,30 @@
   gap: 0.5rem;
 }
 
+.type-tester-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.type-tester-panel.is-open .type-tester-drawer {
+  grid-template-rows: 1fr;
+}
+
+/* Clips the controls while the row is shorter than them. The few pixels of
+ * padding, taken back by the margin, leave room for focus outlines. */
+.type-tester-drawer-inner {
+  min-height: 0;
+  overflow: hidden;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
 .type-tester-body {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+  padding-top: 0.9rem;
 }
 
 .type-tester-field {
@@ -251,6 +270,8 @@
   margin: 0;
   background: transparent;
   cursor: pointer;
+  /* A sideways drag here moves the slider, not the panel or the page. */
+  touch-action: none;
 }
 
 .type-tester-panel input[type="range"]::-webkit-slider-runnable-track {
@@ -293,9 +314,9 @@
   background: var(--tt-ui-bg);
 }
 
-/* Phones: docked along the bottom edge, 10px in from the sides. The navigation sits at
- * the very bottom with the settings bar just above it, and the settings
- * open upwards, so both stay where the thumb is. */
+/* Phones: docked along the bottom edge, 10px in from the sides, with the
+ * navigation at the very bottom. Opening the settings pushes their bar up,
+ * and the controls roll out underneath it. */
 @media (max-width: 768px) {
   .type-tester {
     top: auto;
@@ -312,8 +333,9 @@
     padding: 6px;
   }
 
-  .type-tester-panel {
-    flex-direction: column-reverse;
+  /* Taller sliders, so they're easy to catch with a finger. */
+  .type-tester-panel input[type="range"] {
+    height: 1.75rem;
   }
 
   /* Opening upwards here, so the triangle starts out pointing up. */

@@ -187,6 +187,11 @@
   }
 
   @media (max-width: 768px) {
+    /* Room to scroll the last rows up clear of the settings bar. */
+    .about {
+      padding-bottom: 10vh;
+    }
+
     .about-row {
       transition: font-size 0.5s ease;
     }
