@@ -198,6 +198,13 @@ export default function TypeTester() {
   // corner. Closed, the settings box shrinks to its head bar.
   return (
     <div className="type-tester">
+      {/* Phones only (see type-tester.css): the open settings cover much of
+          the screen there, so a tap anywhere on the page closes them, and
+          does nothing else. */}
+      {open && (
+        <div className="type-tester-backdrop" aria-hidden="true" onClick={() => setOpen(false)} />
+      )}
+
       <nav className="type-tester-box type-tester-nav" aria-label="Site">
         <div className="type-tester-segments">
           {NAV_LINKS.map((link) => (
@@ -216,21 +223,21 @@ export default function TypeTester() {
         className={`type-tester-box type-tester-panel ${open ? "is-open" : ""}`.trim()}
         aria-label="Settings"
       >
-        <div className="type-tester-head">
+        {/* The whole bar opens and closes the settings, not just the triangle. */}
+        <button
+          type="button"
+          className="type-tester-head"
+          aria-expanded={open}
+          aria-controls={`${id}-body`}
+          onClick={() => setOpen((value) => !value)}
+        >
           <span>settings</span>
-          <button
-            type="button"
-            className="type-tester-text-button type-tester-toggle"
-            aria-label={open ? "Close settings" : "Open settings"}
-            aria-expanded={open}
-            aria-controls={`${id}-body`}
-            onClick={() => setOpen((value) => !value)}
-          >
-            <svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+          <span className="type-tester-toggle" aria-hidden="true">
+            <svg width="10" height="6" viewBox="0 0 10 6">
               <path d="M0 0h10L5 6z" fill="currentColor" />
             </svg>
-          </button>
-        </div>
+          </span>
+        </button>
 
         {/* Always mounted, so opening and closing can slide: the drawer's one
             row grows from nothing to the controls' height. Inert while

@@ -20,7 +20,8 @@ const SlideshowContext = createContext<SlideshowContextValue | null>(null);
 
 export function SlideshowProvider({ children }: { children: ReactNode }) {
   const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
-  // A count rather than a flag: the home page mounts a desktop and a mobile slideshow.
+  // A count rather than a flag, so one slideshow unmounting can't hide the
+  // controls of another that's already mounted.
   const [mounted, setMounted] = useState(0);
 
   const register = useCallback(() => {

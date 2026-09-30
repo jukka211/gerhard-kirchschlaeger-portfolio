@@ -1,13 +1,48 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { usePageModes } from "@/components/PageModesContext";
 import { ROW_MODES, GRID_ROW_MODES, type RowMode } from "@/components/rowModes";
 import type { AboutRow } from "@/types/sanity";
 
 const ROT3_ANGLES = [0, 90, 180];
+
+type Row = { key: string; content: ReactNode; href?: string };
+
+// Under the rows from Sanity, after a blank line (a row holding just a
+// <br>): the contact details. Rows like any other, so the modes and the
+// type tester reach them too.
+const CONTACT_ROWS: Row[] = [
+  { key: "contact-break", content: <br /> },
+  {
+    key: "contact-instagram",
+    content: "@gerhard.kirchschlaeger",
+    href: "https://www.instagram.com/gerhard.kirchschlaeger/",
+  },
+  { key: "contact-phone", content: "+43 676 3140568", href: "tel:+436763140568" },
+  {
+    key: "contact-email",
+    content: "gerhard@kirchschlaeger.at",
+    href: "mailto:gerhard@kirchschlaeger.at",
+  },
+  {
+    key: "contact-address",
+    content: (
+      <>
+        Gerhard Kirchschläger,
+        <br />
+        Bahnhofplatz 1,
+        <br />
+        4600 Wels
+        <br />
+        AT
+      </>
+    ),
+    href: "https://maps.app.goo.gl/WCeqwkDLHsS34HXg6",
+  },
+];
 
 function clamp01(value: number) {
   return value < 0 ? 0 : value > 1 ? 1 : value;
@@ -21,6 +56,10 @@ export default function AboutClient({ rows }: { rows: AboutRow[] }) {
   const { setPageModes } = usePageModes();
 
   const isGridMode = GRID_ROW_MODES.includes(mode);
+  const allRows: Row[] = [
+    ...rows.map((row) => ({ key: row._key, content: row.text, href: row.href })),
+    ...CONTACT_ROWS,
+  ];
 
   const selectMode = useCallback((next: string) => {
     const nextMode = next as RowMode;
@@ -86,9 +125,9 @@ export default function AboutClient({ rows }: { rows: AboutRow[] }) {
       </Link>
 
       <main className="about">
-        {rows.map((row, index) => (
+        {allRows.map((row, index) => (
           <section
-            key={row._key}
+            key={row.key}
             ref={(el) => {
               rowRefs.current[index] = el;
             }}
@@ -98,10 +137,17 @@ export default function AboutClient({ rows }: { rows: AboutRow[] }) {
           >
             {row.href ? (
               <p>
-                <a href={row.href}>{row.text}</a>
+                {/* Web links (Instagram, the map) open in a new tab. */}
+                <a
+                  href={row.href}
+                  target={row.href.startsWith("http") ? "_blank" : undefined}
+                  rel={row.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                >
+                  {row.content}
+                </a>
               </p>
             ) : (
-              <p>{row.text}</p>
+              <p>{row.content}</p>
             )}
           </section>
         ))}

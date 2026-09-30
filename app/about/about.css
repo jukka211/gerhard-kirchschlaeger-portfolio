@@ -78,7 +78,6 @@
 
   .about-row a {
     color: black;
-    text-decoration: none;
   }
 }
 
@@ -187,9 +186,10 @@
   }
 
   @media (max-width: 768px) {
-    /* Room to scroll the last rows up clear of the settings bar. */
+    /* Room to scroll the last rows up clear of the settings bar, which is
+     * taller than 10vh on short screens. */
     .about {
-      padding-bottom: 10vh;
+      padding-bottom: max(10vh, 6.5rem);
     }
 
     .about-row {
@@ -209,29 +209,18 @@
   }
 }
 
-/* The default row-hover behaviour — unchanged from before the mode system. */
+/* Rows grow on hover only in the font size mode; by default they stay put. */
 @layer interaction {
-  .mode-default .about-row:hover {
-    font-size: 6rem;
-    line-height: 0.8;
-  }
-
   .mode-fontsize .about-row:hover {
     font-size: 12rem;
     line-height: 0.82;
   }
+}
 
-  @media (min-width: 1920px) {
-    .mode-default .about-row:hover {
-      font-size: clamp(6rem, 5vw, 10rem);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .mode-default .about-row:hover {
-      font-size: clamp(3rem, 14vw, 6rem);
-    }
-  }
+/* Links underlined. Outside the layers, or globals.css's unlayered
+ * `a { text-decoration: none }` would win. */
+.about-row a {
+  text-decoration: underline;
 }
 
 @keyframes marquee {

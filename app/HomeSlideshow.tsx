@@ -15,13 +15,7 @@ type CursorSide = "left" | "right" | null;
 // The home page's images in a size × size grid, starting from the active
 // image. Clicking a cell opens its image at 1 × 1, where the left and right
 // halves of the screen step through the slides.
-export default function HomeSlideshow({
-  slides,
-  variant,
-}: {
-  slides: Slide[];
-  variant: "desktop" | "mobile";
-}) {
+export default function HomeSlideshow({ slides }: { slides: Slide[] }) {
   const { gridSize, setGridSize } = useSlideshowSettings();
   const [activeIndex, setActiveIndex] = useState(0);
   const single = gridSize === 1;
@@ -33,9 +27,7 @@ export default function HomeSlideshow({
 
   return (
     <div
-      className={`home-slideshow home-slideshow--${variant} ${
-        single ? "home-slideshow--single" : ""
-      }`.trim()}
+      className={`home-slideshow ${single ? "home-slideshow--single" : ""}`.trim()}
       role="presentation"
       {...(single ? handlers : {})}
     >

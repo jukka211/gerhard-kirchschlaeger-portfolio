@@ -106,9 +106,12 @@
 }
 
 .type-tester-box {
-  padding: 0.75rem;
   background: var(--tt-ui-bg);
   color: var(--tt-ui-ink);
+}
+
+.type-tester-nav {
+  padding: 2px;
 }
 
 .type-tester-panel {
@@ -116,6 +119,7 @@
   flex-direction: column;
   /* Scrolls on its own when taller than what the navigation leaves of the screen. */
   min-height: 0;
+  padding: 4px;
   overflow-y: auto;
 }
 
@@ -125,6 +129,36 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+}
+
+/* The settings' head bar, all of it one button. Its hit area reaches out
+ * over the box's padding too, so a press anywhere on the closed box opens
+ * it; below the bar it stops short of the first control. */
+.type-tester-head {
+  position: relative;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Out by the panel's padding. */
+.type-tester-head::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+
+/* Page-wide layer under the boxes that closes the open settings; shown on
+ * phones only. */
+.type-tester-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
 }
 
 .type-tester-drawer {
@@ -159,7 +193,6 @@
   gap: 0.4rem;
 }
 
-.type-tester-text-button,
 .type-tester-value {
   padding: 0;
   border: 0;
@@ -168,7 +201,7 @@
   cursor: pointer;
 }
 
-/* The settings toggle: a triangle pointing the way the settings will open,
+/* The triangle on the head bar, pointing the way the settings will open and
  * turning round once they have. */
 .type-tester-toggle {
   display: flex;
@@ -182,19 +215,13 @@
   transition: transform 0.2s ease;
 }
 
-.type-tester-toggle[aria-expanded="true"] svg {
+.type-tester-head[aria-expanded="true"] .type-tester-toggle svg {
   transform: rotate(180deg);
 }
 
-.type-tester-text-button:hover:not(:disabled),
 .type-tester-value:hover:not(:disabled) {
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-.type-tester-text-button:disabled {
-  opacity: 0.35;
-  cursor: default;
 }
 
 .type-tester-value:disabled {
@@ -254,7 +281,7 @@
   cursor: pointer;
 }
 
-.type-tester-text-button:focus-visible,
+.type-tester-head:focus-visible,
 .type-tester-value:focus-visible,
 .type-tester-panel select:focus-visible,
 .type-tester-panel input[type="range"]:focus-visible {
@@ -329,8 +356,8 @@
     max-height: calc(100svh - 20px);
   }
 
-  .type-tester-box {
-    padding: 6px;
+  .type-tester-backdrop {
+    display: block;
   }
 
   /* Taller sliders, so they're easy to catch with a finger. */
@@ -343,7 +370,7 @@
     transform: rotate(180deg);
   }
 
-  .type-tester-toggle[aria-expanded="true"] svg {
+  .type-tester-head[aria-expanded="true"] .type-tester-toggle svg {
     transform: none;
   }
 }

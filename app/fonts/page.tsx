@@ -18,17 +18,14 @@ export default async function FontsPage() {
     mobileSlides: [],
   };
 
-  const toSlides = (slides: FontsPageData["desktopSlides"]) =>
-    (slides ?? [])
-      .filter((slide) => slide.asset?.url)
-      .map((slide) => ({
-        key: slide._key,
-        url: `${slide.asset!.url!}?w=2400&q=75&auto=format`,
-        alt: slide.alt || "",
-      }));
-
-  const desktopSlides = toSlides(page.desktopSlides);
-  const mobileSlides = toSlides(page.mobileSlides);
+  // The desktop slides on phones too, in their original format, as on the home page.
+  const slides = (page.desktopSlides ?? [])
+    .filter((slide) => slide.asset?.url)
+    .map((slide) => ({
+      key: slide._key,
+      url: `${slide.asset!.url!}?w=2400&q=75&auto=format`,
+      alt: slide.alt || "",
+    }));
 
   return (
     <main className="fonts-page">
@@ -46,11 +43,7 @@ export default async function FontsPage() {
         </nav>
       </header>
 
-      <HomeSlideshow slides={desktopSlides} variant="desktop" />
-      <HomeSlideshow
-        slides={mobileSlides.length > 0 ? mobileSlides : desktopSlides}
-        variant="mobile"
-      />
+      <HomeSlideshow slides={slides} />
 
       <FontsInfoPanel introText={page.introText ?? ""} />
     </main>

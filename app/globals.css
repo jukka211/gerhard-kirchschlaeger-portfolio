@@ -88,10 +88,6 @@ p {
   cursor: none;
 }
 
-.home-slideshow--mobile {
-  display: none;
-}
-
 /* One image per cell, --size × --size cells filling the screen. */
 
 .home-slideshow-grid {
@@ -217,13 +213,5 @@ p {
 @media (max-width: 768px) {
   .home-page {
     padding: 1rem;
-  }
-
-  .home-slideshow--desktop {
-    display: none;
-  }
-
-  .home-slideshow--mobile {
-    display: block;
   }
 }
