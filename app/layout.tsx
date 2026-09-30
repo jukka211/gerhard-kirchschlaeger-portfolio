@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { SanityLive } from "@/sanity/lib/live";
 import SanityLiveGate from "./SanityLiveGate";
-import SiteMenu from "@/components/SiteMenu";
-import { SiteMenuProvider } from "@/components/SiteMenuContext";
+import TypeTester from "@/components/TypeTester";
+import { PageModesProvider } from "@/components/PageModesContext";
+import { SlideshowProvider } from "@/components/SlideshowContext";
+import { SITE_FONT_SCRIPT } from "@/components/siteFonts";
 import "./globals.css";
+import "@/components/type-tester.css";
 
 export const metadata: Metadata = {
   title: "Gerhard Kirchschlaeger",
@@ -18,10 +22,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <SiteMenuProvider>
-          {children}
-          <SiteMenu />
-        </SiteMenuProvider>
+        <Script id="site-font" strategy="beforeInteractive">
+          {SITE_FONT_SCRIPT}
+        </Script>
+        <PageModesProvider>
+          <SlideshowProvider>
+            {children}
+            <TypeTester />
+          </SlideshowProvider>
+        </PageModesProvider>
         <SanityLiveGate>
           <SanityLive />
         </SanityLiveGate>

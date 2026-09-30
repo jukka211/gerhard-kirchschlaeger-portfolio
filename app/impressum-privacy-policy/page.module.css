@@ -1,11 +1,10 @@
 .page {
   min-height: 100vh;
   min-height: 100svh;
-  margin: 0 1rem;
-  padding: 0rem 0;
+  padding: 12px;
   background: white;
   color: black;
-  font-family: "OO Arketa Trial", monospace;
+  font-family: var(--site-font), monospace;
 }
 
 .back {
@@ -30,7 +29,6 @@
   width: 100%;
   height: 100vh;
   height: 100svh;
-  padding-top: 1.5rem;
   font-size: 0.85rem;
   line-height: 1.2;
   text-align: center;
@@ -39,24 +37,24 @@
   --focus: -5;
 }
 
-/* default / columns modes keep the original multi-column reading layout */
-.text:global(.mode-default),
+/* default: one full-width column, scrolling down the page */
+.text:global(.mode-default) {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-bottom: 3rem;
+}
+
+/* columns keeps the original multi-column reading layout */
 .text:global(.mode-columns) {
+  column-count: 8;
   column-gap: 1rem;
   column-fill: auto;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-.text:global(.mode-default) {
-  column-count: 3;
-}
-
-.text:global(.mode-columns) {
-  column-count: 8;
-}
-
-/* the rest are stepped through by clicking "(↺)" on the site menu */
+/* the rest are picked from the type tester's mode list */
 .text:global(.mode-focus),
 .text:global(.mode-fontsize),
 .text:global(.mode-converge),
@@ -170,11 +168,6 @@
 }
 
 @media (max-width: 768px) {
-  .page {
-    margin: 0 rem;
-  }
-
-  .text:global(.mode-default),
   .text:global(.mode-columns) {
     column-count: 1;
     height: auto;

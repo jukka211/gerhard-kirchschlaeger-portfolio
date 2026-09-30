@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { useSiteMenu } from "@/components/SiteMenuContext";
-import { ROW_MODES, GRID_ROW_MODES } from "@/components/rowModes";
+import { usePageModes } from "@/components/PageModesContext";
+import { ROW_MODES, GRID_ROW_MODES, type RowMode } from "@/components/rowModes";
 import type { AboutRow } from "@/types/sanity";
 
 const ROT3_ANGLES = [0, 90, 180];
@@ -14,29 +14,26 @@ function clamp01(value: number) {
 }
 
 export default function AboutClient({ rows }: { rows: AboutRow[] }) {
-  const [modeIndex, setModeIndex] = useState(0);
+  const [mode, setMode] = useState<RowMode>("default");
   const [cols, setCols] = useState(1);
   const sheetRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLElement | null)[]>([]);
-  const { setPageAction } = useSiteMenu();
+  const { setPageModes } = usePageModes();
 
-  const mode = ROW_MODES[modeIndex];
   const isGridMode = GRID_ROW_MODES.includes(mode);
 
-  const cycleMode = useCallback(() => {
-    setModeIndex((index) => {
-      const nextIndex = (index + 1) % ROW_MODES.length;
-      if (GRID_ROW_MODES.includes(ROW_MODES[nextIndex])) {
-        setCols(1);
-      }
-      return nextIndex;
-    });
+  const selectMode = useCallback((next: string) => {
+    const nextMode = next as RowMode;
+    setMode(nextMode);
+    if (GRID_ROW_MODES.includes(nextMode)) {
+      setCols(1);
+    }
   }, []);
 
   useEffect(() => {
-    setPageAction(cycleMode);
-    return () => setPageAction(null);
-  }, [cycleMode, setPageAction]);
+    setPageModes({ modes: ROW_MODES, mode, setMode: selectMode });
+    return () => setPageModes(null);
+  }, [mode, selectMode, setPageModes]);
 
   useEffect(() => {
     rowRefs.current.forEach((row) => {

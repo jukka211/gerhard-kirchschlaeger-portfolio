@@ -25,7 +25,7 @@
   display: flex;
   background: var(--gt-ui-stage);
   color: var(--gt-ui-ink);
-  font-family: "OO Arketa Trial", monospace;
+  font-family: var(--site-font), monospace;
 }
 
 /* The control panel

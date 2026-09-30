@@ -1,0 +1,327 @@
+/* Type tester — the two black boxes in the top-right corner of every page
+ * (components/TypeTester.tsx): the site navigation, and under it the
+ * settings, which shrink to their head bar when closed. */
+
+/* Overrides
+ *
+ * TypeTester flags <html> with data-tt-* for each property moved off auto
+ * and puts the value in the matching --tt-* variable. Only flagged properties
+ * are overridden, so anything left on auto keeps following the row modes.
+ * !important because those modes set the same properties per mode, and
+ * about.css sets them from inside cascade layers. */
+
+:root[data-tt-font] :is(.about-row, .legal-row) {
+  font-family: var(--tt-font) !important;
+}
+
+/* Mixed: the site fonts take turns row by row, so no two neighbouring rows
+ * share one. More specific than the rule above, which it overrides. */
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(3n + 1) {
+  font-family: "Gain Black", monospace !important;
+}
+
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(3n + 2) {
+  font-family: "Massimo Grafia Plain Mono", monospace !important;
+}
+
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(3n + 3) {
+  font-family: "Takeoff B4100 Bold", monospace !important;
+}
+
+:root[data-tt-size] :is(.about-row, .legal-row) {
+  font-size: var(--tt-size) !important;
+}
+
+:root[data-tt-tracking] :is(.about-row, .legal-row) {
+  letter-spacing: var(--tt-tracking) !important;
+}
+
+:root[data-tt-leading] :is(.about-row, .legal-row) {
+  line-height: var(--tt-leading) !important;
+}
+
+:root[data-tt-rotation] :is(.about-row, .legal-row) {
+  transform: rotate(var(--tt-rotation)) !important;
+}
+
+:root[data-tt-align] :is(.about-row, .legal-row) {
+  text-align: var(--tt-align) !important;
+}
+
+/* Columns
+ *
+ * data-tt-columns takes over how the page arranges its rows, whatever the
+ * current row mode was doing with the container: they flow down
+ * --tt-columns balanced columns, carrying on down the page past the first
+ * screen. The row modes still style the text itself. */
+
+:root[data-tt-columns] :is(.about, .legal-text) {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 12px !important;
+  overflow: visible !important;
+  animation: none !important;
+  column-count: var(--tt-columns) !important;
+  column-gap: 1rem !important;
+  column-fill: balance !important;
+}
+
+:root[data-tt-columns] :is(.about-row, .legal-row) {
+  display: block !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: normal !important;
+  /* Legal rows all ask not to be broken after, which leaves the columns
+   * nowhere to break and everything in the first one. */
+  break-inside: avoid;
+  break-after: auto !important;
+}
+
+/* Boxes */
+
+.type-tester {
+  --tt-ui-bg: rgb(0, 0, 0);
+  --tt-ui-ink: rgb(255, 255, 255);
+  --tt-ui-ink-faint: rgb(255 255 255 / 45%);
+  --tt-ui-hover: rgb(255 255 255 / 15%);
+
+  /* Native bits (the select's option list, scrollbars) follow the boxes. */
+  color-scheme: dark;
+  position: fixed;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10012;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(16rem, calc(100vw - 1rem));
+  max-height: calc(100vh - 1rem);
+  max-height: calc(100svh - 1rem);
+  /* Always the mono, whichever font the site opened in. */
+  font-family: "Massimo Grafia Plain Mono", monospace;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.type-tester-box {
+  padding: 0.75rem;
+  background: var(--tt-ui-bg);
+  color: var(--tt-ui-ink);
+}
+
+.type-tester-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  /* Scrolls on its own when taller than what the navigation leaves of the screen. */
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.type-tester-head,
+.type-tester-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.type-tester-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.type-tester-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.type-tester-text-button,
+.type-tester-value {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* The settings toggle: a triangle pointing the way the settings will open,
+ * turning round once they have. */
+.type-tester-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.type-tester-toggle svg {
+  transition: transform 0.2s ease;
+}
+
+.type-tester-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.type-tester-text-button:hover:not(:disabled),
+.type-tester-value:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.type-tester-text-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.type-tester-value:disabled {
+  color: var(--tt-ui-ink-faint);
+  cursor: default;
+}
+
+.type-tester-segments {
+  display: flex;
+  border: 1px solid var(--tt-ui-ink);
+}
+
+/* Buttons, and the navigation's links, which look the same. */
+.type-tester-segments :is(button, a) {
+  flex: auto;
+  padding: 0.3rem 0.2rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.type-tester-nav .type-tester-segments a {
+  flex: 1 1 0;
+}
+
+.type-tester-segments :is(button, a) + :is(button, a) {
+  border-left: 1px solid var(--tt-ui-ink);
+}
+
+.type-tester-segments :is(button, a):hover {
+  background: var(--tt-ui-hover);
+}
+
+.type-tester-segments :is(button[aria-pressed="true"], a[aria-current="page"]) {
+  background: var(--tt-ui-ink);
+  color: var(--tt-ui-bg);
+}
+
+.type-tester-segments :is(button, a):focus-visible {
+  outline: 1px solid var(--tt-ui-ink);
+  outline-offset: 2px;
+}
+
+.type-tester-panel select {
+  appearance: none;
+  width: 100%;
+  padding: 0.3rem 1.4rem 0.3rem 0.4rem;
+  border: 1px solid var(--tt-ui-ink);
+  border-radius: 0;
+  background: var(--tt-ui-bg)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='white' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E")
+    no-repeat right 0.45rem center;
+  color: var(--tt-ui-ink);
+  cursor: pointer;
+}
+
+.type-tester-text-button:focus-visible,
+.type-tester-value:focus-visible,
+.type-tester-panel select:focus-visible,
+.type-tester-panel input[type="range"]:focus-visible {
+  outline: 1px solid var(--tt-ui-ink);
+  outline-offset: 2px;
+}
+
+.type-tester-panel input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 0.9rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.type-tester-panel input[type="range"]::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--tt-ui-ink);
+}
+
+.type-tester-panel input[type="range"]::-moz-range-track {
+  height: 1px;
+  background: var(--tt-ui-ink);
+}
+
+.type-tester-panel input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: calc(0.5px - 0.35rem);
+  border: 1px solid var(--tt-ui-ink);
+  border-radius: 50%;
+  background: var(--tt-ui-ink);
+}
+
+.type-tester-panel input[type="range"]::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid var(--tt-ui-ink);
+  border-radius: 50%;
+  background: var(--tt-ui-ink);
+}
+
+/* A hollow thumb means the property is still on auto. */
+.type-tester-field.is-auto input[type="range"]::-webkit-slider-thumb {
+  background: var(--tt-ui-bg);
+}
+
+.type-tester-field.is-auto input[type="range"]::-moz-range-thumb {
+  background: var(--tt-ui-bg);
+}
+
+/* Phones: docked along the bottom edge, 10px in from the sides. The navigation sits at
+ * the very bottom with the settings bar just above it, and the settings
+ * open upwards, so both stay where the thumb is. */
+@media (max-width: 768px) {
+  .type-tester {
+    top: auto;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    flex-direction: column-reverse;
+    width: auto;
+    max-height: calc(100vh - 20px);
+    max-height: calc(100svh - 20px);
+  }
+
+  .type-tester-box {
+    padding: 6px;
+  }
+
+  .type-tester-panel {
+    flex-direction: column-reverse;
+  }
+
+  /* Opening upwards here, so the triangle starts out pointing up. */
+  .type-tester-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  .type-tester-toggle[aria-expanded="true"] svg {
+    transform: none;
+  }
+}

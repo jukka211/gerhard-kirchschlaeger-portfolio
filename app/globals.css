@@ -1,12 +1,31 @@
 /* app/globals.css */
 
+/* The site's typefaces (components/siteFonts.ts). A script in the root
+ * layout sets --site-font to one of them per visit; the fallback here only
+ * shows if it can't run. */
+
 @font-face {
-  font-family: "OO Arketa Trial";
-  src: url("/OOArketaTrial-Regular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
+  font-family: "Gain Black";
+  src: url("/Gain-Black.otf") format("opentype");
   font-display: swap;
 }
+
+@font-face {
+  font-family: "Massimo Grafia Plain Mono";
+  src: url("/MassimoGrafiaPlainMono-Regular.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Takeoff B4100 Bold";
+  src: url("/Takeoff-B4100Bold.otf") format("opentype");
+  font-display: swap;
+}
+
+:root {
+  --site-font: "Massimo Grafia Plain Mono";
+}
+
 ::selection {
   color: white;
   background-color: black;
@@ -22,7 +41,7 @@ body {
   padding: 0;
   background-color: rgb(255, 255, 255);
   color: rgb(255, 255, 255);
-  font-family: "OO Arketa Trial", monospace;
+  font-family: var(--site-font), monospace;
 }
 
 body {
@@ -63,6 +82,9 @@ p {
   inset: 0;
   z-index: 10003;
   overflow: hidden;
+}
+
+.home-slideshow--single {
   cursor: none;
 }
 
@@ -70,22 +92,55 @@ p {
   display: none;
 }
 
-.home-slideshow-slide {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
+/* One image per cell, --size × --size cells filling the screen. */
 
-}
-
-.home-slideshow-slide.is-active {
-  opacity: 1;
-}
-
-.home-slideshow img {
+.home-slideshow-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--size), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--size), minmax(0, 1fr));
   width: 100%;
   height: 100%;
-  object-fit: cover;
+}
+
+.home-slideshow-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.home-slideshow:not(.home-slideshow--single) .home-slideshow-cell {
+  cursor: pointer;
+}
+
+.home-slideshow:not(.home-slideshow--single) .home-slideshow-cell:hover {
+
+  border: solid 1px black;
+}
+
+/* Positioned rather than sized in flow, so the image box is always exactly
+ * its cell and contain keeps the whole image inside it. */
+.home-slideshow-grid img {
+  position: absolute;
+  inset: 0;
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Images at --image-scale of their cell. The inset is worked out from the
+ * same value, so they stay centred whatever it's set to. */
+.home-slideshow:not(.home-slideshow--single) .home-slideshow-grid img {
+  --image-scale: 0.5;
+  inset: calc((1 - var(--image-scale)) * 50%);
+  width: calc(var(--image-scale) * 100%);
+  height: calc(var(--image-scale) * 100%);
+}
+
+/* At 1 × 1, a little room above and below the image. */
+.home-slideshow--single .home-slideshow-grid img {
+  inset: 2rem 0;
+  height: calc(100% - 4rem);
 }
 
 .home-slideshow-cursor {
@@ -99,239 +154,6 @@ p {
   font-size: 0.9rem;
   text-transform: lowercase;
   white-space: nowrap;
-}
-
-/* Global floating menu */
-
-.site-menu-panel {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10010;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.97);
-  pointer-events: none;
-  --mx: 0.5;
-  --my: 0;
-  --focus: -5;
-  --cols: 3;
-}
-
-.site-menu-panel.is-open {
-  display: flex;
-  pointer-events: auto;
-}
-
-.site-menu-panel-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  text-align: center;
-  color: rgb(0, 0, 0);
-  font-size: 0.85rem;
-  line-height: 1.15;
-  transition: all 0.3s ease-in-out;
-}
-
-.site-menu-links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.site-menu-links--contact {
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.8rem;
-}
-
-.site-menu-links a {
-  --i: 0;
-  --rotdir: 1;
-  --rot3: 0deg;
-  --dist: max(calc(var(--i) - var(--focus)), calc(var(--focus) - var(--i)));
-  transition: all 0.3s ease-in-out;
-}
-
-.site-menu-links a:hover {
-text-decoration: underline;
-text-underline-offset: 4px;
-}
-
-/* Menu animation modes, stepped through by clicking "(↺)" while the menu is open. */
-
-.mode-focus .site-menu-links a {
-  font-size: max(0.6rem, calc(3.2rem - var(--dist) * 0.9rem));
-  letter-spacing: calc(var(--dist) * -0.03em);
-}
-
-.mode-fontsize .site-menu-links a:hover {
-  font-size: 4rem;
-}
-
-.mode-converge .site-menu-links a {
-  display: inline-block;
-  font-size: calc(0.85rem + var(--dist) * 0.4rem);
-  letter-spacing: calc(var(--dist) * 0.12em);
-  transform: rotate(calc(var(--dist) * var(--rotdir) * 6deg));
-}
-
-.mode-wave .site-menu-links a {
-  letter-spacing: max(0em, calc(3.5em - var(--dist) * 0.3em));
-}
-
-.mode-cascade .site-menu-links a {
-  display: inline-block;
-  transform: rotate(calc((var(--i) + 1) * (var(--mx) - 0.5) * 20deg));
-}
-
-.mode-lineheight .site-menu-links a {
-  display: inline-block;
-  margin-top: max(0rem, calc(var(--i) * (var(--my) - 0.9) * 1.2rem));
-}
-
-.mode-grid .site-menu-panel-inner,
-.mode-gridrot .site-menu-panel-inner {
-  display: grid;
-  grid-template-columns: repeat(var(--cols, 3), 1fr);
-  grid-template-rows: repeat(var(--cols, 3), 1fr);
-  gap: 0.6rem;
-}
-
-.mode-grid .site-menu-links,
-.mode-gridrot .site-menu-links {
-  display: contents;
-}
-
-.mode-grid .site-menu-links a,
-.mode-gridrot .site-menu-links a {
-  font-size: max(0.5rem, calc(0.4rem + var(--my) * 3rem));
-}
-
-.mode-gridrot .site-menu-links a {
-  display: inline-block;
-  transform: rotate(var(--rot3, 0deg));
-}
-
-.mode-marquee .site-menu-panel-inner {
-  flex-direction: row;
-  flex-wrap: nowrap;
-  width: max-content;
-  gap: 2rem;
-}
-
-.mode-marquee .site-menu-links,
-.mode-marquee .site-menu-links--contact {
-  display: contents;
-}
-
-.mode-marquee .site-menu-links a {
-  white-space: nowrap;
-  font-size: max(1rem, calc(var(--my) * 6rem));
-}
-
-
-
-
-@media (prefers-reduced-motion: reduce) {
-  .site-menu-panel-inner,
-  .site-menu-links a {
-    transition-duration: 0.01ms;
-  }
-
-  .mode-marquee .site-menu-panel-inner {
-    animation: none;
-  }
-}
-
-.site-menu-button-group {
-  position: fixed;
-  bottom: 0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10011;
-  display: flex;
-  align-items: center;
-  gap: 0rem;
-  padding:0;
-  pointer-events: auto;
-  color: rgb(255, 255, 255);
-  mix-blend-mode: difference;
-}
-
-body:has(.home-page) .site-menu-button-group {
-  bottom: 50%;
-  transform: translate(-50%, 50%);
-}
-
-.site-menu-button-group--top {
-  top: 0.25rem;
-  bottom: auto;
-  transform: translateX(-50%);
-}
-
-.site-menu-button {
-  flex-shrink: 0;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  pointer-events: auto;
-  border: none;
-  color: inherit;
-  padding: 0;
-}
-
-.site-menu-button:hover a {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.site-menu-button a {
-  color: inherit;
-  font-size: 0.9rem;
-  text-transform: lowercase;
-  transition: all 0.05s ease-in-out;
-}
-
-.site-menu-refresh-button {
-  position: fixed;
-  bottom: 0.5rem;
-  left: 0.5rem;
-  z-index: 10011;
-  flex-shrink: 0;
-  background: rgb(0, 0, 0);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  pointer-events: auto;
-  border-radius: 20px;
-  padding: 0.2rem 0.2rem;
-  color: rgb(255, 255, 255);
-  transition: all 0.15s ease-in-out;
-  border:none;
- 
-}
-.site-menu-refresh-button:hover {
-  background: black;
-  color: white;
-  scale: 1.1;
-  transform: rotate(360deg);
-
-}
-
-.site-menu-refresh-button img {
-  width: 1.7rem;
-  height: 1.7rem;
-  display: block;
-  padding: 0.1rem;
 }
 
 /* Portfolio slider */
@@ -404,23 +226,4 @@ body:has(.home-page) .site-menu-button-group {
   .home-slideshow--mobile {
     display: block;
   }
-
-  .site-menu-button-group {
-    bottom: 0rem;
-  }
-
-  .site-menu-button-group--top {
-    top: 10px;
-    bottom: auto;
-  }
-
-  .site-menu-refresh-button {
-    bottom: 0rem;
-  }
-
-  .site-menu-refresh-button img {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-
 }

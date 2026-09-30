@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import type { CSSProperties } from "react";
+import { useSlideshowSettings } from "@/components/SlideshowContext";
 
 type Slide = {
   key: string;
@@ -10,6 +12,9 @@ type Slide = {
 
 type CursorSide = "left" | "right" | null;
 
+// The home page's images in a size × size grid, starting from the active
+// image. Clicking a cell opens its image at 1 × 1, where the left and right
+// halves of the screen step through the slides.
 export default function HomeSlideshow({
   slides,
   variant,
@@ -17,83 +22,81 @@ export default function HomeSlideshow({
   slides: Slide[];
   variant: "desktop" | "mobile";
 }) {
+  const { gridSize, setGridSize } = useSlideshowSettings();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [intervalMs, setIntervalMs] = useState(200);
+  const single = gridSize === 1;
+  const { handlers, cursorLabel } = useSideNavigation((direction) =>
+    setActiveIndex((index) => (index + direction + slides.length) % slides.length)
+  );
+
+  if (slides.length === 0) return null;
+
+  return (
+    <div
+      className={`home-slideshow home-slideshow--${variant} ${
+        single ? "home-slideshow--single" : ""
+      }`.trim()}
+      role="presentation"
+      {...(single ? handlers : {})}
+    >
+      <div className="home-slideshow-grid" style={{ "--size": gridSize } as CSSProperties}>
+        {/* More cells than slides repeats them from the start. */}
+        {Array.from({ length: gridSize * gridSize }, (_, index) => {
+          const slideIndex = (activeIndex + index) % slides.length;
+          const slide = slides[slideIndex];
+          return (
+            <div
+              key={index}
+              className="home-slideshow-cell"
+              onClick={
+                single
+                  ? undefined
+                  : () => {
+                      setActiveIndex(slideIndex);
+                      setGridSize(1);
+                    }
+              }
+            >
+              <img src={slide.url} alt={slide.alt} />
+            </div>
+          );
+        })}
+      </div>
+      {single && cursorLabel}
+    </div>
+  );
+}
+
+// Clicking the left half of the screen steps back, the right half forward,
+// with a "previous" / "next" label following the pointer.
+function useSideNavigation(onStep: (direction: -1 | 1) => void) {
   const [cursor, setCursor] = useState<{ x: number; y: number; side: CursorSide }>({
     x: 0,
     y: 0,
     side: null,
   });
 
-  useEffect(() => {
-    if (paused || slides.length < 2) return;
-
-    const interval = setInterval(() => {
-      if (document.hidden) return;
-      setActiveIndex((index) => (index + 1) % slides.length);
-    }, intervalMs);
-
-    return () => clearInterval(interval);
-  }, [slides.length, paused, intervalMs]);
-
   const sideFromEvent = (event: { clientX: number }): CursorSide =>
     event.clientX < window.innerWidth / 2 ? "left" : "right";
 
-  const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
-    setIntervalMs((current) =>
-      Math.min(1500, Math.max(100, current + Math.sign(event.deltaY) * 20))
-    );
+  const handlers = {
+    onClick: (event: React.MouseEvent<HTMLDivElement>) =>
+      onStep(sideFromEvent(event) === "left" ? -1 : 1),
+    onMouseMove: (event: React.MouseEvent<HTMLDivElement>) =>
+      setCursor({ x: event.clientX, y: event.clientY, side: sideFromEvent(event) }),
+    onMouseLeave: () => setCursor((current) => ({ ...current, side: null })),
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    setPaused(true);
-    if (sideFromEvent(event) === "left") {
-      setActiveIndex((index) => (index - 1 + slides.length) % slides.length);
-    } else {
-      setActiveIndex((index) => (index + 1) % slides.length);
-    }
-  };
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    setCursor({ x: event.clientX, y: event.clientY, side: sideFromEvent(event) });
-  };
-
-  const handleMouseLeave = () => {
-    setCursor((current) => ({ ...current, side: null }));
-  };
-
-  if (slides.length === 0) return null;
-
-  return (
-    <div
-      className={`home-slideshow home-slideshow--${variant}`}
-      onClick={handleClick}
-      onWheel={handleWheel}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      role="presentation"
+  const cursorLabel = cursor.side && (
+    <span
+      className="home-slideshow-cursor"
+      style={{
+        transform: `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`,
+      }}
     >
-      {slides.map((slide, index) => (
-        <div
-          key={slide.key}
-          className={`home-slideshow-slide ${
-            index === activeIndex ? "is-active" : ""
-          }`.trim()}
-        >
-          <img src={slide.url} alt={slide.alt} />
-        </div>
-      ))}
-      {cursor.side && (
-        <span
-          className="home-slideshow-cursor"
-          style={{
-            transform: `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`,
-          }}
-        >
-          {cursor.side === "left" ? "previous" : "next"}
-        </span>
-      )}
-    </div>
+      {cursor.side === "left" ? "previous" : "next"}
+    </span>
   );
+
+  return { handlers, cursorLabel };
 }

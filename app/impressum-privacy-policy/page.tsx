@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { useSiteMenu } from "@/components/SiteMenuContext";
+import { usePageModes } from "@/components/PageModesContext";
 
 const LEGAL_MODES = [
   "default",
@@ -297,20 +297,17 @@ function clamp01(value: number) {
 }
 
 export default function ImpressumPrivacyPolicyPage() {
-  const [modeIndex, setModeIndex] = useState(0);
-  const mode: LegalMode = LEGAL_MODES[modeIndex];
+  const [mode, setMode] = useState<LegalMode>("default");
   const textRef = useRef<HTMLElement>(null);
   const rowRefs = useRef<(HTMLElement | null)[]>([]);
-  const { setPageAction } = useSiteMenu();
+  const { setPageModes } = usePageModes();
 
-  const cycleMode = useCallback(() => {
-    setModeIndex((index) => (index + 1) % LEGAL_MODES.length);
-  }, []);
+  const selectMode = useCallback((next: string) => setMode(next as LegalMode), []);
 
   useEffect(() => {
-    setPageAction(cycleMode);
-    return () => setPageAction(null);
-  }, [cycleMode, setPageAction]);
+    setPageModes({ modes: LEGAL_MODES, mode, setMode: selectMode });
+    return () => setPageModes(null);
+  }, [mode, selectMode, setPageModes]);
 
   useEffect(() => {
     rowRefs.current.forEach((row) => {
@@ -352,7 +349,7 @@ export default function ImpressumPrivacyPolicyPage() {
       <main
         id="imprint"
         ref={textRef}
-        className={`${styles.text} mode-${mode}`}
+        className={`${styles.text} legal-text mode-${mode}`}
       >
         {ROWS.map((row, index) => {
           const Tag = row.tag;
@@ -363,7 +360,7 @@ export default function ImpressumPrivacyPolicyPage() {
               ref={(el: HTMLElement | null) => {
                 rowRefs.current[index] = el;
               }}
-              className={styles.legalRow}
+              className={`${styles.legalRow} legal-row`}
               data-row-index={index}
               style={{ "--i": index } as CSSProperties}
             >
