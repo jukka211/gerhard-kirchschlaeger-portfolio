@@ -133,6 +133,17 @@ p {
   height: calc(var(--image-scale) * 100%);
 }
 
+/* Intro: a cell stays hidden until its turn, then appears at once. */
+.home-slideshow-cell--hidden {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-slideshow-cell--hidden {
+    visibility: visible;
+  }
+}
+
 /* At 1 × 1, a little room above and below the image. */
 .home-slideshow--single .home-slideshow-grid img {
   inset: 2rem 0;

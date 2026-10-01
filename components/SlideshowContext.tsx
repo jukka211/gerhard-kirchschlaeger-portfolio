@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 // Columns and rows the grid can have: size × size cells, one image per cell.
 export const GRID_SIZES = [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28] as const;
 
-export const DEFAULT_GRID_SIZE = 4;
+export const DEFAULT_GRID_SIZE = 8;
 
 type SlideshowContextValue = {
   gridSize: number;
