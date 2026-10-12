@@ -8,11 +8,13 @@ type Slide = {
   key: string;
   url: string;
   alt: string;
+  title: string;
 };
 
 // The intro shows the first grid's images one at a time, in reading order:
 // the first row left to right, then the next. Each waits for its image to
-// load, so the order holds however slowly they arrive.
+// load, so the order holds however slowly they arrive. In the title view
+// there are no images to wait for, and everything shows at once.
 const INTRO_CELL_DELAY_MS = 45;
 
 // The home page's images in a size × size grid, starting from the active
@@ -25,7 +27,7 @@ export default function HomeSlideshow({
   slides: Slide[];
   variant: "desktop" | "mobile";
 }) {
-  const { gridSize, setGridSize } = useSlideshowSettings();
+  const { gridSize, setGridSize, spacing, view } = useSlideshowSettings();
   const [activeIndex, setActiveIndex] = useState(0);
   const single = gridSize === 1;
   const gridRef = useRef<HTMLDivElement>(null);
@@ -70,7 +72,7 @@ export default function HomeSlideshow({
       <div
         ref={gridRef}
         className="home-slideshow-grid"
-        style={{ "--size": gridSize } as CSSProperties}
+        style={{ "--size": gridSize, "--spacing": spacing } as CSSProperties}
       >
         {/* More cells than slides repeats them from the start. */}
         {Array.from({ length: gridSize * gridSize }, (_, index) => {
@@ -91,7 +93,11 @@ export default function HomeSlideshow({
                     }
               }
             >
-              <img src={slide.url} alt={slide.alt} />
+              {view === "image" ? (
+                <img src={slide.url} alt={slide.alt} />
+              ) : (
+                <p className="home-slideshow-title">{slide.title}</p>
+              )}
             </div>
           );
         })}

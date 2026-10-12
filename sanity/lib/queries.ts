@@ -6,6 +6,7 @@ export const homePageQuery = groq`
     desktopSlides[]{
       _key,
       alt,
+      title,
       asset->{
         url
       }
@@ -13,6 +14,7 @@ export const homePageQuery = groq`
     mobileSlides[]{
       _key,
       alt,
+      title,
       asset->{
         url
       }
@@ -57,6 +59,7 @@ export const fontsPageQuery = groq`
     desktopSlides[]{
       _key,
       alt,
+      title,
       asset->{
         url
       }
@@ -64,6 +67,7 @@ export const fontsPageQuery = groq`
     mobileSlides[]{
       _key,
       alt,
+      title,
       asset->{
         url
       }

@@ -16,16 +16,20 @@
 
 /* Mixed: the site fonts take turns row by row, so no two neighbouring rows
  * share one. More specific than the rule above, which it overrides. */
-:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(3n + 1) {
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(4n + 1) {
   font-family: "Gain Black", monospace !important;
 }
 
-:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(3n + 2) {
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(4n + 2) {
   font-family: "Massimo Grafia Plain Mono", monospace !important;
 }
 
-:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(3n + 3) {
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(4n + 3) {
   font-family: "Takeoff B4100 Bold", monospace !important;
+}
+
+:root[data-tt-font="mixed"] :is(.about-row, .legal-row):nth-child(4n + 4) {
+  font-family: "Massimo Grafia Bold", monospace !important;
 }
 
 :root[data-tt-size] :is(.about-row, .legal-row) {
@@ -246,12 +250,26 @@
   cursor: pointer;
 }
 
-.type-tester-nav .type-tester-segments a {
-  flex: 1 1 0;
-}
-
 .type-tester-segments :is(button, a) + :is(button, a) {
   border-left: 1px solid var(--tt-ui-ink);
+}
+
+/* The navigation's links sit in a 2 × 2 grid instead of a row. */
+.type-tester-nav .type-tester-segments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.type-tester-nav .type-tester-segments a + a {
+  border-left: 0;
+}
+
+.type-tester-nav .type-tester-segments a:nth-child(even) {
+  border-left: 1px solid var(--tt-ui-ink);
+}
+
+.type-tester-nav .type-tester-segments a:nth-child(n + 3) {
+  border-top: 1px solid var(--tt-ui-ink);
 }
 
 .type-tester-segments :is(button, a):hover {

@@ -22,6 +22,12 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Massimo Grafia Bold";
+  src: url("/MassimoGrafia-Bold.otf") format("opentype");
+  font-display: swap;
+}
+
 :root {
   --site-font: "Massimo Grafia Plain Mono";
 }
@@ -124,10 +130,26 @@ p {
   object-fit: contain;
 }
 
-/* Images at --image-scale of their cell. The inset is worked out from the
+/* The title view's text, in the box an image would have. */
+.home-slideshow-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+/* Images (and titles) at --image-scale of their cell, leaving --spacing
+ * (the type tester's slider) around them. The inset is worked out from the
  * same value, so they stay centred whatever it's set to. */
-.home-slideshow:not(.home-slideshow--single) .home-slideshow-grid img {
-  --image-scale: 0.5;
+.home-slideshow:not(.home-slideshow--single) .home-slideshow-grid :is(img, .home-slideshow-title) {
+  --image-scale: calc(1 - var(--spacing, 0.5));
   inset: calc((1 - var(--image-scale)) * 50%);
   width: calc(var(--image-scale) * 100%);
   height: calc(var(--image-scale) * 100%);
@@ -145,7 +167,7 @@ p {
 }
 
 /* At 1 × 1, a little room above and below the image. */
-.home-slideshow--single .home-slideshow-grid img {
+.home-slideshow--single .home-slideshow-grid :is(img, .home-slideshow-title) {
   inset: 2rem 0;
   height: calc(100% - 4rem);
 }

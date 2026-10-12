@@ -8,6 +8,7 @@ export const SITE_FONTS = [
     family: "Massimo Grafia Plain Mono",
   },
   { id: "takeoff-b4100-bold", label: "TakeOff", family: "Takeoff B4100 Bold" },
+  { id: "massimo-grafia-bold", label: "Massimo Grafia Bold", family: "Massimo Grafia Bold" },
 ] as const;
 
 // Runs before the page paints, so the text never shows up in one font and

@@ -4,19 +4,16 @@ import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import type { PointerEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { usePageModes } from "@/components/PageModesContext";
-import { GRID_SIZES, useSlideshow } from "@/components/SlideshowContext";
+import {
+  GRID_SIZES,
+  GRID_VIEWS,
+  MAX_GRID_SPACING,
+  useSlideshow,
+} from "@/components/SlideshowContext";
 import { SITE_FONTS } from "@/components/siteFonts";
 
 // Each text row in a different one of the site fonts; see type-tester.css.
 const MIXED_ID = "mixed";
-
-// Display names for the row modes whose ids run words together.
-const MODE_LABELS: Record<string, string> = {
-  fontsize: "font size",
-  lineheight: "line height",
-  gridrot: "grid rotated",
-};
 
 type SliderKey = "size" | "tracking" | "leading" | "rotation" | "columns";
 
@@ -109,8 +106,9 @@ const AUTO: Settings = {
 };
 
 const NAV_LINKS = [
-  { label: "home", href: "/", route: "/" },
+  { label: "works", href: "/", route: "/" },
   { label: "info", href: "/about", route: "/about" },
+  { label: "contact", href: "/contact", route: "/contact" },
   { label: "legal", href: "/impressum-privacy-policy#imprint", route: "/impressum-privacy-policy" },
 ];
 
@@ -168,8 +166,6 @@ function isCurrent(pathname: string | null, route: string) {
 export default function TypeTester() {
   const id = useId();
   const pathname = usePathname();
-  // The current page's row modes, if it has any.
-  const { pageModes: modes } = usePageModes();
   const slideshow = useSlideshow();
   const [open, setOpen] = useState(false);
   const [settings, setSettings] = useState<Settings>(AUTO);
@@ -277,14 +273,51 @@ export default function TypeTester() {
         <div className="type-tester-drawer" inert={!open}>
           <div className="type-tester-drawer-inner">
             {/* With a slideshow on the page the panel offers only its grid
-                size, otherwise only the type settings. */}
+                settings, otherwise only the type settings. */}
             <div id={`${id}-body`} className="type-tester-body">
               {slideshow.active ? (
-                <GridSizeField
-                  id={`${id}-grid`}
-                  size={slideshow.gridSize}
-                  onChange={slideshow.setGridSize}
-                />
+                <>
+                  <div className="type-tester-field">
+                    <span id={`${id}-view`}>show</span>
+                    <div
+                      className="type-tester-segments"
+                      role="group"
+                      aria-labelledby={`${id}-view`}
+                    >
+                      {GRID_VIEWS.map((view) => (
+                        <button
+                          key={view}
+                          type="button"
+                          aria-pressed={slideshow.view === view}
+                          onClick={() => slideshow.setView(view)}
+                        >
+                          {view}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <GridSizeField
+                    id={`${id}-grid`}
+                    size={slideshow.gridSize}
+                    onChange={slideshow.setGridSize}
+                  />
+
+                  <div className="type-tester-field">
+                    <div className="type-tester-label">
+                      <label htmlFor={`${id}-spacing`}>spacing</label>
+                      <span>{Math.round(slideshow.spacing * 100)} %</span>
+                    </div>
+                    <RangeInput
+                      id={`${id}-spacing`}
+                      min={0}
+                      max={MAX_GRID_SPACING}
+                      step={0.01}
+                      value={slideshow.spacing}
+                      onValueChange={slideshow.setSpacing}
+                    />
+                  </div>
+                </>
               ) : (
                 <>
                   <div className="type-tester-field">
@@ -355,31 +388,17 @@ export default function TypeTester() {
                       ))}
                     </div>
                   </div>
-
-                  {modes && (
-                    <div className="type-tester-field">
-                      <label htmlFor={`${id}-mode`}>mode</label>
-                      <select
-                        id={`${id}-mode`}
-                        value={modes.mode}
-                        onChange={(event) => modes.setMode(event.target.value)}
-                      >
-                        {/* Default is only what the page opens on: shown, but not in the list. */}
-                        {modes.modes.map((mode) => (
-                          <option
-                            key={mode}
-                            value={mode}
-                            disabled={mode === "default"}
-                            hidden={mode === "default"}
-                          >
-                            {MODE_LABELS[mode] ?? mode}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
                 </>
               )}
+
+              <div className="type-tester-segments">
+                <button
+                  type="button"
+                  onClick={() => (slideshow.active ? slideshow.reset() : setSettings(AUTO))}
+                >
+                  reset
+                </button>
+              </div>
             </div>
           </div>
         </div>

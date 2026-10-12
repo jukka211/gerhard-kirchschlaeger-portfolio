@@ -15,10 +15,12 @@ export default async function HomePage() {
   const toSlides = (slides: HomePageData["desktopSlides"]) =>
     (slides ?? [])
       .filter((slide) => slide.asset?.url)
-      .map((slide) => ({
+      .map((slide, index) => ({
         key: slide._key,
         url: `${slide.asset!.url!}?w=2400&q=75&auto=format`,
         alt: slide.alt || "",
+        // A placeholder until the slide gets a title in Sanity.
+        title: slide.title || `Work ${String(index + 1).padStart(2, "0")}`,
       }));
 
   const desktopSlides = toSlides(data?.desktopSlides);

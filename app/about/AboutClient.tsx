@@ -5,50 +5,18 @@ import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { usePageModes } from "@/components/PageModesContext";
 import { ROW_MODES, GRID_ROW_MODES, type RowMode } from "@/components/rowModes";
-import type { AboutRow } from "@/types/sanity";
 
 const ROT3_ANGLES = [0, 90, 180];
 
-type Row = { key: string; content: ReactNode; href?: string };
-
-// Under the rows from Sanity, after a blank line (a row holding just a
-// <br>): the contact details. Rows like any other, so the modes and the
-// type tester reach them too.
-const CONTACT_ROWS: Row[] = [
-  { key: "contact-break", content: <br /> },
-  {
-    key: "contact-instagram",
-    content: "@gerhard.kirchschlaeger",
-    href: "https://www.instagram.com/gerhard.kirchschlaeger/",
-  },
-  { key: "contact-phone", content: "+43 676 3140568", href: "tel:+436763140568" },
-  {
-    key: "contact-email",
-    content: "gerhard@kirchschlaeger.at",
-    href: "mailto:gerhard@kirchschlaeger.at",
-  },
-  {
-    key: "contact-address",
-    content: (
-      <>
-        Gerhard Kirchschläger,
-        <br />
-        Bahnhofplatz 1,
-        <br />
-        4600 Wels
-        <br />
-        AT
-      </>
-    ),
-    href: "https://maps.app.goo.gl/WCeqwkDLHsS34HXg6",
-  },
-];
+// One line of the page: Sanity text on the info page, or a contact detail
+// (see contactRows.tsx).
+export type Row = { key: string; content: ReactNode; href?: string };
 
 function clamp01(value: number) {
   return value < 0 ? 0 : value > 1 ? 1 : value;
 }
 
-export default function AboutClient({ rows }: { rows: AboutRow[] }) {
+export default function AboutClient({ rows }: { rows: Row[] }) {
   const [mode, setMode] = useState<RowMode>("default");
   const [cols, setCols] = useState(1);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -56,10 +24,6 @@ export default function AboutClient({ rows }: { rows: AboutRow[] }) {
   const { setPageModes } = usePageModes();
 
   const isGridMode = GRID_ROW_MODES.includes(mode);
-  const allRows: Row[] = [
-    ...rows.map((row) => ({ key: row._key, content: row.text, href: row.href })),
-    ...CONTACT_ROWS,
-  ];
 
   const selectMode = useCallback((next: string) => {
     const nextMode = next as RowMode;
@@ -125,7 +89,7 @@ export default function AboutClient({ rows }: { rows: AboutRow[] }) {
       </Link>
 
       <main className="about">
-        {allRows.map((row, index) => (
+        {rows.map((row, index) => (
           <section
             key={row.key}
             ref={(el) => {
