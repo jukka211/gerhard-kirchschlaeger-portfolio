@@ -223,6 +223,11 @@
   text-decoration: underline;
 }
 
+/* On the contact page, where every row is a link, only on hover. */
+.contact-sheet .about-row a:not(:hover, :focus-visible) {
+  text-decoration: none;
+}
+
 @keyframes marquee {
   from {
     transform: translateX(100vw);

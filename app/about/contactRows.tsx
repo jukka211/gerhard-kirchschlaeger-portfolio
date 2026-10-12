@@ -1,7 +1,6 @@
 import type { Row } from "./AboutClient";
 
-// The contact details, shown under the info page's text and on their own
-// on the contact page. Rows like any other, so the modes and the type
+// The contact page's rows. Rows like any other, so the modes and the type
 // tester reach them too.
 export const CONTACT = {
   phone: { key: "contact-phone", content: "+43 676 3140568", href: "tel:+436763140568" },

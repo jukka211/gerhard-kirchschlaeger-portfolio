@@ -33,7 +33,6 @@ export type GalleryItem = {
 export type BackgroundSlide = {
   _key: string;
   alt?: string;
-  title?: string;
   asset?: {
     url?: string;
   };

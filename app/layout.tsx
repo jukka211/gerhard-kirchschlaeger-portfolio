@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { SanityLive } from "@/sanity/lib/live";
 import SanityLiveGate from "./SanityLiveGate";
 import TypeTester from "@/components/TypeTester";
 import { PageModesProvider } from "@/components/PageModesContext";
 import { SlideshowProvider } from "@/components/SlideshowContext";
-import { SITE_FONT_SCRIPT } from "@/components/siteFonts";
 import "./globals.css";
 import "@/components/type-tester.css";
 
@@ -22,9 +20,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Script id="site-font" strategy="beforeInteractive">
-          {SITE_FONT_SCRIPT}
-        </Script>
         <PageModesProvider>
           <SlideshowProvider>
             {children}

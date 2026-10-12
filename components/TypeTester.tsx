@@ -4,18 +4,13 @@ import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import type { PointerEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  GRID_SIZES,
-  GRID_VIEWS,
-  MAX_GRID_SPACING,
-  useSlideshow,
-} from "@/components/SlideshowContext";
-import { SITE_FONTS } from "@/components/siteFonts";
+import { GRID_SIZES, MAX_GRID_SPACING, useSlideshow } from "@/components/SlideshowContext";
+import { DEFAULT_FONT_ID, SITE_FONTS } from "@/components/siteFonts";
 
 // Each text row in a different one of the site fonts; see type-tester.css.
 const MIXED_ID = "mixed";
 
-type SliderKey = "size" | "tracking" | "leading" | "rotation" | "columns";
+type SliderKey = "size" | "tracking" | "leading" | "columns";
 
 type Slider = {
   key: SliderKey;
@@ -66,16 +61,6 @@ const SLIDERS: Slider[] = [
     toCss: (value) => `${value}`,
   },
   {
-    key: "rotation",
-    label: "rotation",
-    min: -180,
-    max: 180,
-    step: 1,
-    rest: 0,
-    format: (value) => `${value}°`,
-    toCss: (value) => `${value}deg`,
-  },
-  {
     key: "columns",
     label: "columns",
     min: 1,
@@ -101,34 +86,15 @@ const AUTO: Settings = {
   size: null,
   tracking: null,
   leading: null,
-  rotation: null,
   columns: null,
 };
 
 const NAV_LINKS = [
   { label: "work", href: "/", route: "/" },
-  { label: "info", href: "/about", route: "/about" },
+  { label: "about", href: "/about", route: "/about" },
   { label: "contact", href: "/contact", route: "/contact" },
   { label: "legal", href: "/impressum-privacy-policy#imprint", route: "/impressum-privacy-policy" },
 ];
-
-// The font this visit opened in (see siteFonts.ts), which the font list
-// shows until another is picked. It's set before the page paints and never
-// changes, so there's nothing to subscribe to; the server, which can't know
-// it, renders the first font until hydration swaps in the real one.
-const subscribeToNothing = () => () => {};
-
-function useSiteFontId() {
-  return useSyncExternalStore(subscribeToNothing, siteFontId, () => SITE_FONTS[0].id);
-}
-
-function siteFontId() {
-  const family = getComputedStyle(document.documentElement)
-    .getPropertyValue("--site-font")
-    .trim()
-    .replace(/^"|"$/g, "");
-  return (SITE_FONTS.find((font) => font.family === family) ?? SITE_FONTS[0]).id;
-}
 
 // Whether the phone layout in type-tester.css applies.
 const PHONE_QUERY = "(max-width: 768px)";
@@ -169,7 +135,6 @@ export default function TypeTester() {
   const slideshow = useSlideshow();
   const [open, setOpen] = useState(false);
   const [settings, setSettings] = useState<Settings>(AUTO);
-  const siteFont = useSiteFontId();
   const phone = useIsPhone();
 
   // Settings live on <html> so they survive navigating between the about
@@ -277,39 +242,13 @@ export default function TypeTester() {
             <div id={`${id}-body`} className="type-tester-body">
               {slideshow.active ? (
                 <>
-                  <div className="type-tester-field">
-                    <span id={`${id}-view`}>show</span>
-                    <div
-                      className="type-tester-segments"
-                      role="group"
-                      aria-labelledby={`${id}-view`}
-                    >
-                      {GRID_VIEWS.map((view) => (
-                        <button
-                          key={view}
-                          type="button"
-                          aria-pressed={slideshow.view === view}
-                          onClick={() => slideshow.setView(view)}
-                        >
-                          {view}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   <GridSizeField
                     id={`${id}-grid`}
                     size={slideshow.gridSize}
                     onChange={slideshow.setGridSize}
                   />
 
-                  {/* Titles fill their cells whatever the spacing, so it's
-                      locked while they're shown. */}
-                  <div
-                    className={`type-tester-field ${
-                      slideshow.view === "title" ? "is-disabled" : ""
-                    }`.trim()}
-                  >
+                  <div className="type-tester-field">
                     <div className="type-tester-label">
                       <label htmlFor={`${id}-spacing`}>spacing</label>
                       <span>{Math.round(slideshow.spacing * 100)} %</span>
@@ -320,7 +259,6 @@ export default function TypeTester() {
                       max={MAX_GRID_SPACING}
                       step={0.01}
                       value={slideshow.spacing}
-                      disabled={slideshow.view === "title"}
                       onValueChange={slideshow.setSpacing}
                     />
                   </div>
@@ -331,7 +269,7 @@ export default function TypeTester() {
                     <label htmlFor={`${id}-font`}>font</label>
                     <select
                       id={`${id}-font`}
-                      value={settings.font ?? siteFont}
+                      value={settings.font ?? DEFAULT_FONT_ID}
                       onChange={(event) => update("font", event.target.value)}
                     >
                       {SITE_FONTS.map((font) => (
@@ -456,7 +394,6 @@ function RangeInput({
   max,
   step,
   value,
-  disabled,
   onValueChange,
 }: {
   id: string;
@@ -464,7 +401,6 @@ function RangeInput({
   max: number;
   step: number;
   value: number;
-  disabled?: boolean;
   onValueChange: (value: number) => void;
 }) {
   const decimals = String(step).split(".")[1]?.length ?? 0;
@@ -485,10 +421,9 @@ function RangeInput({
       max={max}
       step={step}
       value={value}
-      disabled={disabled}
       onChange={(event) => onValueChange(Number(event.target.value))}
       onPointerDown={(event) => {
-        if (event.pointerType !== "touch" || disabled) return;
+        if (event.pointerType !== "touch") return;
         event.preventDefault();
         event.currentTarget.setPointerCapture(event.pointerId);
         setFromPointer(event);

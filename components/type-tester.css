@@ -44,10 +44,6 @@
   line-height: var(--tt-leading) !important;
 }
 
-:root[data-tt-rotation] :is(.about-row, .legal-row) {
-  transform: rotate(var(--tt-rotation)) !important;
-}
-
 :root[data-tt-align] :is(.about-row, .legal-row) {
   text-align: var(--tt-align) !important;
 }
@@ -348,16 +344,6 @@
   border: 1px solid var(--tt-ui-ink);
   border-radius: 50%;
   background: var(--tt-ui-ink);
-}
-
-/* A locked field (spacing while the grid shows titles) fades out. */
-.type-tester-field.is-disabled {
-  color: var(--tt-ui-ink-faint);
-}
-
-.type-tester-panel input[type="range"]:disabled {
-  opacity: 0.45;
-  cursor: default;
 }
 
 /* A hollow thumb means the property is still on auto. */

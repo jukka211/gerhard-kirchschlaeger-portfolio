@@ -8,7 +8,7 @@ import { ROW_MODES, GRID_ROW_MODES, type RowMode } from "@/components/rowModes";
 
 const ROT3_ANGLES = [0, 90, 180];
 
-// One line of the page: Sanity text on the info page, or a contact detail
+// One line of the page: Sanity text on the about page, or a contact detail
 // (see contactRows.tsx).
 export type Row = { key: string; content: ReactNode; href?: string };
 
@@ -16,7 +16,13 @@ function clamp01(value: number) {
   return value < 0 ? 0 : value > 1 ? 1 : value;
 }
 
-export default function AboutClient({ rows }: { rows: Row[] }) {
+export default function AboutClient({
+  rows,
+  className,
+}: {
+  rows: Row[];
+  className?: string;
+}) {
   const [mode, setMode] = useState<RowMode>("default");
   const [cols, setCols] = useState(1);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -80,7 +86,7 @@ export default function AboutClient({ rows }: { rows: Row[] }) {
   return (
     <div
       ref={sheetRef}
-      className={`about-sheet mode-${mode}`}
+      className={`about-sheet mode-${mode} ${className ?? ""}`.trim()}
       style={{ "--cols": cols } as CSSProperties}
       onClick={handleSheetClick}
     >

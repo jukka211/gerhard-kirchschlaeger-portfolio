@@ -84,12 +84,6 @@ export const fontsPage = defineType({
           options: { hotspot: true },
           fields: [
             defineField({
-              name: "title",
-              title: "Title",
-              description: "Shown instead of the image when the grid is switched to titles.",
-              type: "string",
-            }),
-            defineField({
               name: "alt",
               title: "Alt text",
               type: "string",
@@ -109,12 +103,6 @@ export const fontsPage = defineType({
           type: "image",
           options: { hotspot: true },
           fields: [
-            defineField({
-              name: "title",
-              title: "Title",
-              description: "Shown instead of the image when the grid is switched to titles.",
-              type: "string",
-            }),
             defineField({
               name: "alt",
               title: "Alt text",

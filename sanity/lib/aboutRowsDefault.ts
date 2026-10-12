@@ -34,10 +34,5 @@ export const aboutRowsDefault: AboutRowDefault[] = [
   { text: "2x IF Design Award" },
   { text: "2x Good Design Award" },
   { text: "1x Award360 Shortlist" },
-  { text: "+43 676 3140568", href: "tel:+436763140568" },
-  {
-    text: "gerhard@kirchschlaeger.at",
-    href: "mailto:gerhard@kirchschlaeger.at",
-  },
   { text: "UID ATU49887500" },
 ];

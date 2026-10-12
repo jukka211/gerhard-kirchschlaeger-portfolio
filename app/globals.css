@@ -1,8 +1,7 @@
 /* app/globals.css */
 
-/* The site's typefaces (components/siteFonts.ts). A script in the root
- * layout sets --site-font to one of them per visit; the fallback here only
- * shows if it can't run. */
+/* The site's typefaces (components/siteFonts.ts). The site is set in
+ * --site-font; the type tester can switch the text to the others. */
 
 @font-face {
   font-family: "Gain Black";
@@ -108,8 +107,6 @@ p {
   position: relative;
   min-width: 0;
   min-height: 0;
-  /* Lets the title size itself to the cell (cqmin below). */
-  container-type: size;
 }
 
 .home-slideshow:not(.home-slideshow--single) .home-slideshow-cell {
@@ -130,24 +127,6 @@ p {
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-/* The title view's text, filling its cell whatever the spacing. It shrinks
- * with the cell, so the more cells the grid has, the smaller the titles;
- * cells big enough stop at the info page's text size. */
-.home-slideshow-title {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0.2em;
-  overflow: hidden;
-  font-size: min(0.85rem, 12cqmin);
-  line-height: 1.2;
-  text-align: center;
-  overflow-wrap: break-word;
 }
 
 /* Images at --image-scale of their cell, leaving --spacing (the type
@@ -172,7 +151,7 @@ p {
 }
 
 /* At 1 × 1, a little room above and below the image. */
-.home-slideshow--single .home-slideshow-grid :is(img, .home-slideshow-title) {
+.home-slideshow--single .home-slideshow-grid img {
   inset: 2rem 0;
   height: calc(100% - 4rem);
 }

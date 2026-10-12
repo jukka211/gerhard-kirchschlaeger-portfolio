@@ -3,9 +3,12 @@ import "../about/about.css";
 import AboutClient from "../about/AboutClient";
 import { CONTACT } from "../about/contactRows";
 
-// The info page's contact details on their own, in the same style.
+// The contact details, in the about page's style.
 export default function ContactPage() {
   return (
-    <AboutClient rows={[CONTACT.phone, CONTACT.email, CONTACT.instagram, CONTACT.address]} />
+    <AboutClient
+      className="contact-sheet"
+      rows={[CONTACT.phone, CONTACT.email, CONTACT.instagram, CONTACT.address]}
+    />
   );
 }
