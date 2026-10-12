@@ -350,6 +350,16 @@
   background: var(--tt-ui-ink);
 }
 
+/* A locked field (spacing while the grid shows titles) fades out. */
+.type-tester-field.is-disabled {
+  color: var(--tt-ui-ink-faint);
+}
+
+.type-tester-panel input[type="range"]:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 /* A hollow thumb means the property is still on auto. */
 .type-tester-field.is-auto input[type="range"]::-webkit-slider-thumb {
   background: var(--tt-ui-bg);

@@ -106,7 +106,7 @@ const AUTO: Settings = {
 };
 
 const NAV_LINKS = [
-  { label: "works", href: "/", route: "/" },
+  { label: "work", href: "/", route: "/" },
   { label: "info", href: "/about", route: "/about" },
   { label: "contact", href: "/contact", route: "/contact" },
   { label: "legal", href: "/impressum-privacy-policy#imprint", route: "/impressum-privacy-policy" },
@@ -303,7 +303,13 @@ export default function TypeTester() {
                     onChange={slideshow.setGridSize}
                   />
 
-                  <div className="type-tester-field">
+                  {/* Titles fill their cells whatever the spacing, so it's
+                      locked while they're shown. */}
+                  <div
+                    className={`type-tester-field ${
+                      slideshow.view === "title" ? "is-disabled" : ""
+                    }`.trim()}
+                  >
                     <div className="type-tester-label">
                       <label htmlFor={`${id}-spacing`}>spacing</label>
                       <span>{Math.round(slideshow.spacing * 100)} %</span>
@@ -314,6 +320,7 @@ export default function TypeTester() {
                       max={MAX_GRID_SPACING}
                       step={0.01}
                       value={slideshow.spacing}
+                      disabled={slideshow.view === "title"}
                       onValueChange={slideshow.setSpacing}
                     />
                   </div>
@@ -449,6 +456,7 @@ function RangeInput({
   max,
   step,
   value,
+  disabled,
   onValueChange,
 }: {
   id: string;
@@ -456,6 +464,7 @@ function RangeInput({
   max: number;
   step: number;
   value: number;
+  disabled?: boolean;
   onValueChange: (value: number) => void;
 }) {
   const decimals = String(step).split(".")[1]?.length ?? 0;
@@ -476,9 +485,10 @@ function RangeInput({
       max={max}
       step={step}
       value={value}
+      disabled={disabled}
       onChange={(event) => onValueChange(Number(event.target.value))}
       onPointerDown={(event) => {
-        if (event.pointerType !== "touch") return;
+        if (event.pointerType !== "touch" || disabled) return;
         event.preventDefault();
         event.currentTarget.setPointerCapture(event.pointerId);
         setFromPointer(event);

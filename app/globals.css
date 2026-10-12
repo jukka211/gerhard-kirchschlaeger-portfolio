@@ -108,6 +108,8 @@ p {
   position: relative;
   min-width: 0;
   min-height: 0;
+  /* Lets the title size itself to the cell (cqmin below). */
+  container-type: size;
 }
 
 .home-slideshow:not(.home-slideshow--single) .home-slideshow-cell {
@@ -130,7 +132,9 @@ p {
   object-fit: contain;
 }
 
-/* The title view's text, in the box an image would have. */
+/* The title view's text, filling its cell whatever the spacing. It shrinks
+ * with the cell, so the more cells the grid has, the smaller the titles;
+ * cells big enough stop at the info page's text size. */
 .home-slideshow-title {
   position: absolute;
   inset: 0;
@@ -138,17 +142,18 @@ p {
   align-items: center;
   justify-content: center;
   margin: 0;
+  padding: 0.2em;
   overflow: hidden;
-  font-size: 0.85rem;
+  font-size: min(0.85rem, 12cqmin);
   line-height: 1.2;
   text-align: center;
   overflow-wrap: break-word;
 }
 
-/* Images (and titles) at --image-scale of their cell, leaving --spacing
- * (the type tester's slider) around them. The inset is worked out from the
- * same value, so they stay centred whatever it's set to. */
-.home-slideshow:not(.home-slideshow--single) .home-slideshow-grid :is(img, .home-slideshow-title) {
+/* Images at --image-scale of their cell, leaving --spacing (the type
+ * tester's slider) around them. The inset is worked out from the same
+ * value, so they stay centred whatever it's set to. */
+.home-slideshow:not(.home-slideshow--single) .home-slideshow-grid img {
   --image-scale: calc(1 - var(--spacing, 0.5));
   inset: calc((1 - var(--image-scale)) * 50%);
   width: calc(var(--image-scale) * 100%);
